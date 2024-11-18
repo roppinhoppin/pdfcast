@@ -51,7 +51,8 @@ for i,folder in enumerate(folders):
     # Generate markdown content
     markdown_content = template.format(
         folder=folder,
-        date=date
+        date=date,
+        num=num,
     )
     
     with open(markdown_file_path, "w", encoding="utf-8") as file:
