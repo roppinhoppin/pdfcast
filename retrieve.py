@@ -45,8 +45,8 @@ for i,folder in enumerate(folders):
     if os.path.exists(markdown_file_path):
         print(f"Skipping existing podcast article: {markdown_file_path}")
         continue
-    audio_file_name = folder + ".wav"  # Replace spaces with underscores for file names
-    pdf_file_name = folder + ".pdf"
+    audio_file_path = folder_path + "/" + folder + ".wav"  # Replace spaces with underscores for file names
+    pdf_file_path = folder_path + "/" +  folder + ".pdf"
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
     
     # Generate markdown content
@@ -57,5 +57,31 @@ for i,folder in enumerate(folders):
     
     with open(markdown_file_path, "w", encoding="utf-8") as file:
         file.write(markdown_content)
+
+    # Copy the audio file to the audio directory
+    audio_output_dir = "audio/"
+    os.makedirs(audio_output_dir, exist_ok=True)
+    audio_output_path = os.path.join(audio_output_dir, os.path.basename(audio_file_path))
+
+    if os.path.exists(audio_file_path):
+        with open(audio_file_path, "rb") as src_file:
+            with open(audio_output_path, "wb") as dst_file:
+                dst_file.write(src_file.read())
+        print(f"Copied audio file to: {audio_output_path}")
+    else:
+        print(f"Audio file not found: {audio_file_path}")
+
+    # Copy the pdf file to the pdf directory
+    pdf_output_dir = "pdf/"
+    os.makedirs(pdf_output_dir, exist_ok=True)
+    pdf_output_path = os.path.join(pdf_output_dir, os.path.basename(pdf_file_path))
+    
+    if os.path.exists(pdf_file_path):
+        with open(pdf_file_path, "rb") as src_file:
+            with open(pdf_output_path, "wb") as dst_file:
+                dst_file.write(src_file.read())
+        print(f"Copied pdf file to: {pdf_output_path}")
+    else:
+        print(f"PDF file not found: {pdf_file_path}")
     
     print(f"Created podcast article: {markdown_file_path}")

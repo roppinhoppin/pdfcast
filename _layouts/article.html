@@ -36,7 +36,11 @@
             </p>
             <h2>内容紹介</h2>
             <p>{{ page.description }}</p>
-            <p>{{ site.github.url }}{{ page.pdffile_path }}</p>
+            <p>
+              <a href="{{ site.github.url }}{{ page.pdffile_path }}"
+                >PDFリンク</a
+              >
+            </p>
             <!-- <h2>
               出演者
             </h2>
