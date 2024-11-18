@@ -14,10 +14,12 @@ audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
 date: {date}
-description: {description}.
+description: AI-generated podcast from the PDF file {folder}
 layout: article
 title: {folder}
 ---
+
+{transcription}
 
 """
 
@@ -74,8 +76,6 @@ for i,folder in enumerate(folders):
         print(f"Copied pdf file to: {pdf_output_path}")
     else:
         print(f"PDF file not found: {pdf_file_path}")
-    
-    print(f"Created podcast article: {markdown_file_path}")
 
     # Copy the transcript file to the transcript directory
     transcript_file_path = folder_path + "/" + folder + ".txt"
@@ -92,21 +92,22 @@ for i,folder in enumerate(folders):
         print(f"Transcript file not found: {transcript_file_path}")
 
     # Read the description from the transfript_file_path
-    description = ""
+    transcription = ""
     if os.path.exists(transcript_file_path):
         with open(transcript_file_path, "r") as file:
-            description = file.read()
+            transcription = file.read()
     else:
         print(f"Transcript file not found: {transcript_file_path}")
 
-    description = ""
     # Generate markdown content
     markdown_content = template.format(
         folder=folder,
         date=date,
         num=num,
-        description=description
+        transcription=transcription
     )
     
     with open(markdown_file_path, "w", encoding="utf-8") as file:
         file.write(markdown_content)
+
+    print(f"Created podcast article: {markdown_file_path}")
