@@ -19,7 +19,6 @@ layout: article
 title: {folder}
 ---
 
-## 関連リンク
 """
 
 # Get the list of folders in the directory
