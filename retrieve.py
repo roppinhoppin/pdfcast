@@ -33,6 +33,10 @@ os.makedirs(output_dir, exist_ok=True)
 
 # Process each folder
 for i,folder in enumerate(folders):
+    is_wav = False
+    is_pdf = False
+    is_txt = False
+
     folder_path = os.path.join(directory, folder)
     # Write the markdown file
     num = hashlib.md5(folder.encode()).hexdigest()
@@ -62,6 +66,7 @@ for i,folder in enumerate(folders):
             with open(audio_output_path, "wb") as dst_file:
                 dst_file.write(src_file.read())
         print(f"Copied audio file to: {audio_output_path}")
+        is_wav = True
     else:
         print(f"Audio file not found: {audio_file_path}")
 
@@ -75,6 +80,7 @@ for i,folder in enumerate(folders):
             with open(pdf_output_path, "wb") as dst_file:
                 dst_file.write(src_file.read())
         print(f"Copied pdf file to: {pdf_output_path}")
+        is_pdf = True
     else:
         print(f"PDF file not found: {pdf_file_path}")
 
@@ -89,6 +95,7 @@ for i,folder in enumerate(folders):
             with open(transcript_output_path, "wb") as dst_file:
                 dst_file.write(src_file.read())
         print(f"Copied transcript file to: {transcript_output_path}")
+        is_txt = True
     else:
         print(f"Transcript file not found: {transcript_file_path}")
 
@@ -108,7 +115,11 @@ for i,folder in enumerate(folders):
         transcription=transcription
     )
     
-    with open(markdown_file_path, "w", encoding="utf-8") as file:
-        file.write(markdown_content)
+    if is_wav and is_pdf and is_txt:
+        with open(markdown_file_path, "w", encoding="utf-8") as file:
+            file.write(markdown_content)
+        print(f"Created podcast article: {markdown_file_path}")
+    else:
+        print(f"Skipping podcast article creation for folder: {folder}")
 
-    print(f"Created podcast article: {markdown_file_path}")
+    
