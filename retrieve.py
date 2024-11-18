@@ -14,7 +14,7 @@ audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
 date: {date}
-description: Auto-generated podcast article for {folder}.
+description: {description}.
 layout: article
 title: {folder}
 ---
@@ -48,15 +48,6 @@ for i,folder in enumerate(folders):
     pdf_file_path = folder_path + "/" +  folder + ".pdf"
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
     
-    # Generate markdown content
-    markdown_content = template.format(
-        folder=folder,
-        date=date,
-        num=num,
-    )
-    
-    with open(markdown_file_path, "w", encoding="utf-8") as file:
-        file.write(markdown_content)
 
     # Copy the audio file to the audio directory
     audio_output_dir = "audio/"
@@ -99,3 +90,23 @@ for i,folder in enumerate(folders):
         print(f"Copied transcript file to: {transcript_output_path}")
     else:
         print(f"Transcript file not found: {transcript_file_path}")
+
+    # Read the description from the transfript_file_path
+    description = ""
+    if os.path.exists(transcript_file_path):
+        with open(transcript_file_path, "r") as file:
+            description = file.read()
+    else:
+        print(f"Transcript file not found: {transcript_file_path}")
+
+
+    # Generate markdown content
+    markdown_content = template.format(
+        folder=folder,
+        date=date,
+        num=num,
+        description=description
+    )
+    
+    with open(markdown_file_path, "w", encoding="utf-8") as file:
+        file.write(markdown_content)
