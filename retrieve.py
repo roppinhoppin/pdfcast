@@ -99,7 +99,7 @@ for i,folder in enumerate(folders):
     else:
         print(f"Transcript file not found: {transcript_file_path}")
 
-
+    description = ""
     # Generate markdown content
     markdown_content = template.format(
         folder=folder,
