@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import hashlib 
 
 # Define the directory to search for folders
 directory = "/Users/kaoru/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/pdfpod/"
@@ -9,13 +10,13 @@ template = """---
 actor_ids:
   - alice
   - bob
-audio_file_path: /audio/{audio_file_name}.wav
-transcript_path: /transcript/{audio_file_name}.txt
-pdffile_path: /pdf/{pdf_file_name}.pdf
+audio_file_path: /audio/{folder}.wav
+transcript_path: /transcript/{folder}.txt
+pdffile_path: /pdf/{folder}.pdf
 date: {date}
-description: Auto-generated podcast article for {audio_file_name}.
+description: Auto-generated podcast article for {folder}.
 layout: article
-title: {audio_file_name}
+title: {folder}
 ---
 
 ## 関連リンク
@@ -32,7 +33,12 @@ os.makedirs(output_dir, exist_ok=True)
 for i,folder in enumerate(folders):
     folder_path = os.path.join(directory, folder)
     # Write the markdown file
-    num = abs(hash(folder))
+    num = hashlib.md5(folder.encode()).hexdigest()
+    # Check if there's a file that contains num in the _posts directory
+    existing_files = [f for f in os.listdir(output_dir) if str(num) in f]
+    if existing_files:
+        print(f"Skipping existing podcast article for folder: {folder}")
+        continue
     markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     markdown_file_path = os.path.join(output_dir, markdown_file_name)
     
@@ -45,8 +51,7 @@ for i,folder in enumerate(folders):
     
     # Generate markdown content
     markdown_content = template.format(
-        audio_file_name=audio_file_name,
-        pdf_file_name=pdf_file_name,
+        folder=folder,
         date=date
     )
     
