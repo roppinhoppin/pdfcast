@@ -29,8 +29,16 @@ output_dir = "/Users/kaoru/Desktop/podcast-gen/pdfcast/_posts/"
 os.makedirs(output_dir, exist_ok=True)
 
 # Process each folder
-for folder in folders:
+for i,folder in enumerate(folders):
     folder_path = os.path.join(directory, folder)
+    # Write the markdown file
+    num = abs(hash(folder))
+    markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
+    markdown_file_path = os.path.join(output_dir, markdown_file_name)
+    
+    if os.path.exists(markdown_file_path):
+        print(f"Skipping existing podcast article: {markdown_file_path}")
+        continue
     audio_file_name = folder + ".wav"  # Replace spaces with underscores for file names
     pdf_file_name = folder + ".pdf"
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
@@ -41,10 +49,6 @@ for folder in folders:
         pdf_file_name=pdf_file_name,
         date=date
     )
-    
-    # Write the markdown file
-    markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{folder}.md"
-    markdown_file_path = os.path.join(output_dir, markdown_file_name)
     
     with open(markdown_file_path, "w", encoding="utf-8") as file:
         file.write(markdown_content)
