@@ -1,15 +1,17 @@
-version: "3"
 services:
   jekyll:
     build:
       context: .
       dockerfile: ./docker/jekyll/Dockerfile
-    command: bundle exec jekyll serve --force_polling --host 0.0.0.0 --incremental
+    platform: linux/amd64
+    command: jekyll serve -s /usr/src/app --watch --host 0.0.0.0 --incremental
     ports:
       - "4000:4000"
     volumes:
       - ./:/app
       - bundle:/bundle
+      - ./:/usr/src/app
+      - ./_site:/srv/jekyll/_site
 volumes:
   bundle:
     driver: local
