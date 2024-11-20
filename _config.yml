@@ -1,12 +1,12 @@
-actors:
-  alice:
-    image_url: /images/actors/alice.png
-    name: alice
-    url: http://sns.example.com/alice
-  bob:
-    image_url: /images/actors/bob.png
-    name: bob
-    url: http://sns.example.com/bob
+# actors:
+#   alice:
+#     image_url: /images/actors/alice.png
+#     name: alice
+#     url: http://sns.example.com/alice
+#   bob:
+#     image_url: /images/actors/bob.png
+#     name: bob
+#     url: http://sns.example.com/bob
 author: Matthew
 description: Turn PDFs into Podcast
 description_long: Transform your PDFs into engaging audio podcasts with ease. This tool uses advanced text-to-speech technology to convert the contents of your PDF documents into high-quality audio files, allowing you to listen to books, research papers, reports, or any written material on the go. Whether you’re commuting, exercising, or simply relaxing, this solution makes it effortless to absorb knowledge and stay productive without being tied to a screen.
