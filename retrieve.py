@@ -10,9 +10,6 @@ directory = "/Users/kaoru/Library/Mobile Documents/iCloud~is~workflow~my~workflo
 
 # Define the template for the markdown file
 template = """---
-actor_ids:
-  - alice
-  - bob
 audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf

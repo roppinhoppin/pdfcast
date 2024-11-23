@@ -6,7 +6,7 @@ import platform
 system = platform.system()
 
 if system == "Linux":
-    magicpdfbin = "docker run --rm -it --gpus=all -v $(pwd)/pdf:/pdf mineru:latest magic-pdf"
+    magicpdfbin = "docker run --rm -it --gpus=all -v $(pwd)/pdf:/pdf --user $(id -u):$(id -g) mineru:latest magic-pdf"
 elif system == "Darwin":
     magicpdfbin = "/Users/kaoru/anaconda3/envs/mineru/bin/magic-pdf"
 else:
@@ -74,7 +74,8 @@ def convert_from_pdf(pdf_path, update=True):
     pdf_name = os.path.basename(pdf_path)[:-4]
     folder_path = os.path.join(os.path.dirname(pdf_path), pdf_name)
     image_folder = os.path.join(folder_path, "auto/images/")
-    if os.path.exists(folder_path) and update is False:
+    is_done = os.path.exists(os.path.join(folder_path, f"auto/{pdf_name}.md"))
+    if is_done and update is False:
         image_files = [image_folder + f for f in os.listdir(image_folder)]
         return image_files
     else:
@@ -94,12 +95,12 @@ if __name__ == "__main__":
     # print(convert_from_pdf(pdffile))
 
     def iterate_and_convert(pdf_directory):
-        for root, dirs, files in os.walk(pdf_directory):
-            for file in files:
-                if file.endswith(".pdf"):
-                    pdf_path = os.path.join(root, file)
-                    print(f"Converting: {pdf_path}")
-                    convert_from_pdf(pdf_path, update=False)
+        for file in os.listdir(pdf_directory):
+            if file.endswith(".pdf"):
+                pdf_path = os.path.join(pdf_directory, file)
+                print(f"Converting: {pdf_path}")
+                convert_from_pdf(pdf_path, update=False)
+                print(f"Done: {file}")
 
     pdf_directory = "pdf/"
     iterate_and_convert(pdf_directory)
