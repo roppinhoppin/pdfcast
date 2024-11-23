@@ -18,9 +18,9 @@ exclude:
   - Gemfile.lock
   - LICENSE.txt
   - README.md
-  - vendor/
-  - .conda/
-  - magic_pdf/
+  - vendor
+  - .conda
+  - magic_pdf
 # google_analytics:
 hashtag: paperscast
 itunes_podcast_url:
