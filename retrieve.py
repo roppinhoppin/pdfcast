@@ -117,31 +117,12 @@ for i,folder in enumerate(folders):
         print(f"Transcript file not found: {transcript_file_path}")
 
     # Extract images from the PDF file
-    images = figure_extract.convert_from_path(folder_path)
     image_paths = []
-
-    # Create directory for images if it doesn't exist
-    image_output_dir = f"images/{num}/"
-    os.makedirs(image_output_dir, exist_ok=True)
-
-    for i, image in enumerate(images):
-        image_path = f"images/{num}/{i+1}.png"
-        image.save(image_path)
-        image_paths.append(image_path)
-
-    orig_image_files = figure_extract.convert_from_path(folder_path)
-    image_paths = []
-
-    # Create directory for images if it doesn't exist
-    image_output_dir = f"images/{num}/"
-    os.makedirs(image_output_dir, exist_ok=True)
-
-    for i, image in enumerate(orig_image_files):
-        with open(image, "rb") as src_file:
-            image_path = f"images/{num}/{i+1}.png"
-            with open(image_path, "wb") as dst_file:
-                dst_file.write(src_file.read())
-            image_paths.append(image_path)
+    pdf_image_folder = os.path.join("pdf", str(num), "auto", "images")
+    if os.path.exists(pdf_image_folder):
+        image_paths = [os.path.join(pdf_image_folder, f) for f in os.listdir(pdf_image_folder) if f.endswith(".png")]
+    else:
+        print(f"Figure folder not found: {pdf_image_folder}")
 
     # Generate markdown content
     markdown_content = template.format(
