@@ -50,24 +50,33 @@ for i, folder in enumerate(folders):
     is_txt = False
 
     folder_path = os.path.join(directory, folder)
+    pdf_file_path = folder_path + "/" + folder + ".pdf"
     # Write the markdown file
     num = hashlib.md5(folder.encode()).hexdigest()
+    with open(pdf_file_path, "rb") as pdf_file:
+        num2 = hashlib.md5(pdf_file.read()).hexdigest()
+
     # Check if there's a file that contains num in the _posts directory
     existing_files = [f for f in os.listdir(output_dir) if str(num) in f]
-    markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
-    if existing_files:
-        print(f"Skipping existing podcast article for folder: {folder}")
+    if len(existing_files) > 0:
         if args.update:
             markdown_file_name = existing_files[0]
         else:
+            print(f"Skipping existing podcast article for folder: {folder}")
             continue
+    else:
+        num = num2
+        markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     markdown_file_path = os.path.join(output_dir, markdown_file_name)
 
     audio_file_path = (
         folder_path + "/" + folder + ".wav"
     )  # Replace spaces with underscores for file names
-    pdf_file_path = folder_path + "/" + folder + ".pdf"
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
+    if len(existing_files) > 0:
+        d = existing_files[0].split("-")
+        date = d[0] + "-" + d[1] + "-" + d[2]
+    else:
+        date = datetime.now().strftime("%Y-%m-%d")
 
     # Copy the audio file to the audio directory
     audio_output_dir = "audio/"
@@ -145,7 +154,7 @@ for i, folder in enumerate(folders):
         math_extract=math_extract,
     )
 
-    if is_pdf:
+    if is_pdf and is_wav:
         with open(markdown_file_path, "w", encoding="utf-8") as file:
             file.write(markdown_content)
         print(f"Created podcast article: {markdown_file_path}")

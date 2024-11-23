@@ -38,8 +38,8 @@
             {% for image in page.images %}
               <img src="{{ site.github.url }}/{{ image }}" width="400">
             {% endfor %}
-            <h2>内容紹介</h2>
-            <p>{{ page.description }}</p>
+            <!-- <h2>内容紹介</h2>
+            <p>{{ page.description }}</p> -->
             {{ content }}
             <h1>Original PDF</h1>
             <object data="{{ site.github.url }}{{ page.pdffile_path }}" width="1000" height="1200" type="application/pdf"></object>
