@@ -22,7 +22,7 @@ exclude:
   - .conda
   - magic-pdf
 # google_analytics:
-hashtag: paperscast
+hashtag: pdfcast
 itunes_podcast_url:
 keywords: comma,separated,keywords
 language: ja
@@ -31,5 +31,5 @@ permalink: /episode/:title
 sass:
   sass_dir: css
 timezone: Asia/Tokyo
-title: Paperscast
+title: PDFcast
 url: https://roppinhoppin.github.io/pdfcast/
