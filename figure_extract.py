@@ -75,8 +75,11 @@ def convert_from_pdf(pdf_path, update=False):
     image_folder = os.path.join(folder_path, "auto/images/")
     is_done = os.path.exists(os.path.join(folder_path, f"auto/{pdf_name}.md"))
     if is_done and update is False:
-        image_files = [image_folder + f for f in os.listdir(image_folder)]
-        return image_files
+        if os.path.exists(image_folder):
+            image_files = [image_folder + f for f in os.listdir(image_folder)]
+            return image_files
+        else:
+            return []
     else:
         command = f"{magicpdfbin} -p {pdf_path} -o {os.path.dirname(pdf_path)}"
         output = subprocess.run(
