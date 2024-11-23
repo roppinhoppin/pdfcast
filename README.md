@@ -7,8 +7,8 @@ conda activate pdfcast
 Install [MinerU](https://github.com/opendatalab/MinerU)
 ```
 pip install -U magic-pdf[full] --extra-index-url https://wheels.myhloli.com
-
+```
 # Install other dependencies
 ```
-
+pip install google-generativeai python-dotenv
 ```

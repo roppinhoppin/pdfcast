@@ -8,9 +8,6 @@ directory = "/Users/kaoru/Library/Mobile Documents/iCloud~is~workflow~my~workflo
 
 # Define the template for the markdown file
 template = """---
-actor_ids:
-  - alice
-  - bob
 audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
@@ -18,11 +15,14 @@ date: {date}
 images: {images}
 description: AI-generated podcast from the PDF file {folder}
 layout: article
-title: {folder}
+title: {folder} / {num}
 ---
 
-## 文字起こし
+## Transcription
 {transcription}
+
+
+{math_extract}
 
 """
 
@@ -130,6 +130,11 @@ for i, folder in enumerate(folders):
     else:
         print(f"Figure folder not found: {pdf_image_folder}")
 
+    math_extract = ""
+    if os.path.exists(f"math/{num}.md"):
+        with open(f"math/{num}.md", "r") as file:
+            math_extract = file.read()
+
     # Generate markdown content
     markdown_content = template.format(
         folder=folder,
@@ -137,6 +142,7 @@ for i, folder in enumerate(folders):
         num=num,
         images=image_paths,
         transcription=transcription,
+        math_extract=math_extract,
     )
 
     if is_pdf:
