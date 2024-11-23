@@ -1,6 +1,6 @@
 #!/bin/bash
-python figure_extract.py
 git pull
+python figure_extract.py
 git add pdf/
 git commit -m "update pdf using minerU on popos"
 git push
