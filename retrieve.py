@@ -3,13 +3,14 @@ import hashlib
 import os
 from datetime import datetime
 
-import figure_extract
-
 # Define the directory to search for folders
 directory = "/Users/kaoru/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/pdfpod/"
 
 # Define the template for the markdown file
 template = """---
+actor_ids:
+  - alice
+  - bob
 audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
@@ -25,19 +26,25 @@ title: {folder}
 
 """
 
-parser = argparse.ArgumentParser(description=f"Retrieve podcast data from directory {directory} and turn the data into podcast")
-parser.add_argument("--update", action="store_true", help="Update existring article when .")
+parser = argparse.ArgumentParser(
+    description=f"Retrieve podcast data from directory {directory} and turn the data into podcast"
+)
+parser.add_argument(
+    "--update", action="store_true", help="Update existring article when ."
+)
 args = parser.parse_args()
 
 # Get the list of folders in the directory
-folders = [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))]
+folders = [
+    f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))
+]
 
 # Create output directory if it doesn't exist
 output_dir = "/Users/kaoru/Desktop/podcast-gen/pdfcast/_posts/"
 os.makedirs(output_dir, exist_ok=True)
 
 # Process each folder
-for i,folder in enumerate(folders):
+for i, folder in enumerate(folders):
     is_wav = False
     is_pdf = False
     is_txt = False
@@ -54,13 +61,13 @@ for i,folder in enumerate(folders):
             markdown_file_name = existing_files[0]
         else:
             continue
-    markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     markdown_file_path = os.path.join(output_dir, markdown_file_name)
-    
-    audio_file_path = folder_path + "/" + folder + ".wav"  # Replace spaces with underscores for file names
-    pdf_file_path = folder_path + "/" +  folder + ".pdf"
+
+    audio_file_path = (
+        folder_path + "/" + folder + ".wav"
+    )  # Replace spaces with underscores for file names
+    pdf_file_path = folder_path + "/" + folder + ".pdf"
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
-    
 
     # Copy the audio file to the audio directory
     audio_output_dir = "audio/"
@@ -80,7 +87,7 @@ for i,folder in enumerate(folders):
     pdf_output_dir = "pdf/"
     os.makedirs(pdf_output_dir, exist_ok=True)
     pdf_output_path = os.path.join(pdf_output_dir, str(num) + ".pdf")
-    
+
     if os.path.exists(pdf_file_path):
         with open(pdf_file_path, "rb") as src_file:
             with open(pdf_output_path, "wb") as dst_file:
@@ -117,7 +124,9 @@ for i,folder in enumerate(folders):
     image_paths = []
     pdf_image_folder = os.path.join("pdf", str(num), "auto", "images")
     if os.path.exists(pdf_image_folder):
-        image_paths = [os.path.join(pdf_image_folder, f) for f in os.listdir(pdf_image_folder) if f.endswith(".png")]
+        image_paths = [
+            os.path.join(pdf_image_folder, f) for f in os.listdir(pdf_image_folder)
+        ]
     else:
         print(f"Figure folder not found: {pdf_image_folder}")
 
@@ -127,9 +136,9 @@ for i,folder in enumerate(folders):
         date=date,
         num=num,
         images=image_paths,
-        transcription=transcription
+        transcription=transcription,
     )
-    
+
     if is_wav and is_pdf:
         with open(markdown_file_path, "w", encoding="utf-8") as file:
             file.write(markdown_content)
