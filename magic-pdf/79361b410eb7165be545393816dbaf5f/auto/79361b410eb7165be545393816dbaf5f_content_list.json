@@ -1,0 +1,2271 @@
+[
+    {
+        "type": "text",
+        "text": "I MPROVED STATISTICAL AND COMPUTATIONAL COM -PLEXITY OF THE MEAN -FIELD LANGEVIN DYNAMICS UNDER STRUCTURED DATA ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "∗Atsushi Nitanda 1 ,, Kazusato $\\mathbf{Oko^{3,4}}$ , Taiji Suzuki 3 ,, Denny $\\mathbf{W}\\mathbf{u}^{5,6}$ ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "∗Alphabetical ordering. 1 IHPC, Agency for Science, Technology and Research, Singapore,   \n2 CFAR, Agency for Science, Technology and Research, Singapore,   \n3 Department of Mathematical Informatics, the University of Tokyo,   \n4 Center for Advanced Intelligence Project, RIKEN, 5 Center for Data Science, New York University,   \n6 Center for Computational Mathematics, Flatiron Institute ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "atsushi_nitanda@cfar.a-star.edu.sg ,oko-kazusato@g.ecc.u-tokyo.ac.jp ,taiji@mist.i.u-tokyo.ac.jp ,dennywu@nyu.edu ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "A BSTRACT ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Recent works have shown that neural networks optimized by gradient-based methods can adapt to sparse or low-dimensional target functions through feature learning; an often studied target is the sparse parity function on the unit hypercube. However, such isotropic data setting does not capture the anisotropy and low intrinsic dimensionality exhibited in realistic datasets. In this work, we address this shortcoming by studying how gradient-based feature learning interacts with structured (anisotropic) input data: we consider the classification of $k$ -sparse parity on high-dimensional orthotope where the feature coordinates have varying magnitudes, and analyze the learning complexity of the mean-field Langevin dynamics (MFLD), which describes the noisy gradient descent update on two-layer neural network. We show that the statistical complexity (i.e. sample size) and computational complexity (i.e. network width) of MFLD can both be improved when prominent directions of the anisotropic input data align with the support of the target function. Moreover, by employing a coordinate transform determined by the gradient covariance, the width can be made independent of the target degree $k$ . Lastly, we demonstrate the benefit of feature learning by establishing a kernel lower bound on the classification error, which applies to neural networks in the lazy regime. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 I NTRODUCTION ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "We consider the learning of a two-layer nonlinear neural network (NN) with $N$ neurons: ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{f(z)=\\frac{1}{N}\\sum_{i=1}^{N}h_{x^{(i)}}(z),\\quad z\\in\\mathbb{R}^{d},\\;h_{x^{(i)}}(z):\\mathbb{R}^{d}\\to\\mathbb{R},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "where $h_{x^{(i)}}(z)$ is one neuron with tra eter $\\boldsymbol{x}^{(i)}$ , e.g., we may set $\\boldsymbol{x}^{(i)}\\in\\mathbb{R}^{d}$ and $h_{x^{(i)}}(z)=$ $\\sigma\\big(\\langle z,x^{(i)}\\rangle\\big)$ to learn representation that adapts to the learning problem, such as sparsity and low-dimensional with some nonlinearity $\\sigma:\\mathbb{R}\\rightarrow\\mathbb{R}$ →. One crucial benefit of the model (1 )is the ability structures. Indeed, it has been shown that this feature learning ability enables NNs trained with gradient-based algorithms to avoid the curse of dimensionality and outperform non-adaptive methods such as kernel models in learning various low-dimensional target functions ( Abbe et al. ,2022 ;Ba et al. ,2022 ;Damian et al. ,2022 ;Bietti et al. ,2022 ;Mousavi-Hosseini et al. ,2022 ;Abbe et al. ,2023 ). ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "A noticeable example of low-dimensional problem is the classification of $k$ -sparse parity, where the target bel is defined as the sign of the produ of $k\\ll d$ coordinates: $\\begin{array}{r}{f_{*}(z_{i})=\\mathrm{sign}(\\prod_{i=1}^{k}z_{i})}\\end{array}$ \u0000 Q \u0001,where $z_{i}$ denotes the i -th coordinate of vector z. The classical XOR problem corresponds to the case where $k=2$ and input on the unit hypercube. Efficiently learning this target function requires the first-layer parameters of the NN to identify the relevant $k$ -dimensional subspace, which can be achieved via gradient-based feature learning ( Daniely and Malach ,2020 ;Refinetti et al. ,2021 ;Frei et al. ,2022 ;Barak et al. ,2022 ;Ben Arous et al. ,2022 ). ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "One particularly relevant feature learning paradigm for the parity problem is the mean-field analysis, which lifts the optimization problem into the space of measures ( Nitanda and Suzuki ,2017 ;Chizat 2018 ;Mei et al. ,2018 ;Rotskoff and Vanden-Eijnden ,2018 ). For isotropic input $(z_{i}\\in$ $\\{-1,+1\\})$ Wei et al. {− 2-parity (XOR), when the NN is optimized by (modified) gradient flow. Very recently, }(), mean-field NN can learn the parity function with 2019 ); Chizat and Bach (2020 ); Telgarsky (2023 ) proved a linear s O$\\mathcal{O}(d/n)$ omplexity classification error for . Specifically, Suzuki et al. (2023b ) considered a noisy variant of gradient descent termed the mean-field Langevin dynamics (MFLD), and s owed that the ${\\mathcal{O}}(d/n)$ rate remains valid for the isotropic $k$ -parity problem with dimension-free k. While the computational complexity is demanding due to the exponential width required in the mean-field analysis, one remarkable feature is the statistical complexity decouples the degree $k$ from the exponent in the dimension dependence; this contrasts the NTK analysis where a sample size of $n=\\bar{\\Omega}(d^{k})$ is typically needed to learn a degree$k$ polynomial on isotropic input data (Ghorbani et al. ,2019 ;Mei et al. ,2022 ), and thus demonstrates the benefit of feature learning. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Feature learning under structured data. Noticeably, most existing analyses on the parity problem are restricted to the isotropic setting, where the input features do not provide any information of the support of the target function. On the other hand, realistic datasets are often structured, and different feature directions may have different magnitudes that guide the algorithm towards efficient learning. For example, real-world data often has low intrinsic dimensionality ( Fodor ,2002 ;Pope et al. ,2021 ), and the observation that input directions with larger variation tend to have good predictive power has motivated various data preprocessing procedures such as PCA ( Hastie et al. ,2009 ). ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Recent works have indeed illustrated that in certain regression settings with low-dimensional target, anisotropic input data can improve the performance of both kernel methods and NNs. However, these results either did not take into account the optimization dynamics of NN ( Suzuki and Nitanda ,2019 ;Ghorbani et al. ,2020 ), or characterized the feature learning dynamics in a “narrow-width” setting (Ba et al. ,2023 ;Mousavi-Hosseini et al. ,2023 ) which differs from the mean-field regime. Moreover, classification and regression problems have fundamentally different structures, and thus existing regression analyses do not directly translate to the $k$ -parity classification problem. Therefore, our goal is to investigate the interplay between structured data and feature learning in the problem setting of classifying $k$ -sparse parity function on anisotropic input data with mean-field NN. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1.1 OUR CONTRIBUTIONS ",
+        "text_level": 1,
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "We study the statistical and computational complexity of the mean-field Langevin dynamics in learning a $k$ -sparse parity target function on anisotropic input data. Specifically, we consider the following generating process of the data-label pairs $(z,y)$ ,",
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{z=A\\tilde{z},\\quad y=\\mathrm{sign}\\big(\\prod_{i\\in I_{k}}\\tilde{z}_{i}\\big),\\quad\\mathrm{where}\\,\\,\\tilde{z}_{i}\\stackrel{i.i.d.}{\\sim}\\mathrm{Unif}\\big(\\{-1/\\sqrt{d},1/\\sqrt{d}\\}\\big),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "for some matrix $A\\in\\mathbb{R}^{d\\times d}$ which controls the anisotropy. Extending the convergence analysis of MFLD in Suzuki et al. (2023a ;b), we prove discrete-time and finite-width learning guarantees for two-layer neural network optimized with noisy gradient descent for this general data setting. We then specialize our general learnability result to specific examples where MFLD benefits from structured data through an improvement of the constant in the logarithmic Sobolev inequality of a proximal Gibbs measure associated with the training dynamics, and demonstrate that both the statistical and computational complexity improves upon that in the isotropic setting. In particular, we show that •When the feature directions of $z$ with large magnitude align with the support of the target function $I_{k}$ , then MFLD can achieve better statistical complexity (required sample size) and computational complexity (required network width) compared to the isotropic setting in Suzuki et al. (2023b ). •If we apply a coordinate transformation based on the gradient covariance matrix, then the required width for MFLD can be made independent of the degree $k$ . This is equivalent to an anisotropic $\\ell_{2}$ regularization, and we prove that the weighting matrix can be estimated from the first gradient step. •We also provide a classification error lower bound for kernel methods in the anisotropic parity setting, which highlights the advantage of gradient-based feature learning via MFLD. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In Table 1 we summarize and compare our results against prior works on learning sparse parity functions. To clearly illustrate the improved dimension dependence, we state our rates for a simple spiked covariance model analogous to the setting in Ghorbani et al. (2020 ); Ba et al. (2023 ) (see (10 )in Section 4.1 ): the data-label pairs $(z,y)$ are generated as $\\begin{array}{r}{y=\\mathrm{sign}\\big(\\prod_{i=1}^{k}z_{i}\\big)}\\end{array}$ \u0001for $k=\\mathcal{O}_{d}(1)$ ,where the informative directi s$z_{i}\\in\\{\\pm d^{(\\alpha-1)/2}\\}$ ($(i=1,\\cdots\\,,k)$ · · · for $\\alpha\\in[0,1]$ , and the unin irections $z_{i}\\in\\{\\pm d^{-1/2}\\}$ ∈{± }($(i=k+1,\\cdot\\cdot\\cdot,d)$ · · · ). In this example, larger α(hence smaller $d_{\\mathrm{eff}}=d^{1-\\alpha},$ ) corresponds to stronger anisotropy, which facilities feature learning due to the alignment between the low-dimensional structure and the target function. As shown in Table 1 , this benefit is evident in both the original MFLD and the coordinate-transformed version. ",
+        "page_idx": 1
+    },
+    {
+        "type": "table",
+        "img_path": "images/9ea6917163a81476874b878130d324c83fee4acf8ba17b65110a7823aa9bda91.jpg",
+        "table_caption": [],
+        "table_footnote": [
+            "Table 1: Statistical and computational complexity for the $k$ -sparse parity classification, omitting polylogarithmic terms. $d$ is the dimensionality, and $_n$ is the sample size. We set $\\begin{array}{r}{\\bar{y}=\\mathrm{sign}\\big(\\prod_{i=1}^{k}\\tilde{z}_{i}\\big)}\\end{array}$ \u0000 Q \u0001,$A=\\operatorname{diag}(s_{1},s_{2},...,s_{d})$ ,where $s_{1}=...=s_{k}=d^{\\alpha/2}$ $\\alpha\\geq0$ $s_{k+1}=\\ldots=s_{d}=1$ ; following Ghorbani et al. (2020 ) we define (the 2023 effective dimension ) do not cover the general as $d_{\\mathrm{eff}}:=d^{1-\\alpha}\\ll d$ k-parity setting, so we state the complexity for 2-parity (XOR). For the lower ≪when $\\alpha>0$ . We note that results from Wei et al. (2019 ); Telgarsky bound, we restate ( Barak et al. ,2022 , Theorem 5) for bounded norm random features predictor. Finally, for the kernel lower bound in Theorem 3 we only track the dimension dependence. "
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2 PROBLEM SETTING ",
+        "text_level": 1,
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$k$ -sparse parity classification. We consider the following binary classification problem. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Definition 1 ($k$ -sparse parity problem under linear transformation) .Given invertible matrix $A$ , the input random variable $Z$ and the corresponding label $Y$ are generated as ",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{Z=A\\tilde{Z},\\quad Y=\\mathrm{sign}\\big(\\prod_{i\\in I_{k}}\\tilde{Z}_{i}\\big),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $\\tilde{Z}$ is distributed from the uniform distribution on $\\{\\pm1/\\sqrt{d}\\}^{d}$ }, and $\\|Z\\|\\leq1$ almost surely. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "This definition includes the well-studied XOR ( Wei et al. ,2019 ;Telgarsky ,2023 ) as a special case. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Example 1 (Isotropic XOR) .We take $A=I_{d}$ and $Y=\\mathrm{sign}(\\tilde{Z}_{1}\\tilde{Z}_{2})\\,(k=2)$ .",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Similarly, we can also cover $k$ -parity on isotropic data ( Barak et al. ,2022 ;Suzuki et al. ,2023b ). ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "As for anisotropic data, an example that we will consider in the subsequent sections is the following axis-aligned setting, where the coordinates are independent but may have different magnitudes. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Example 2 (Axis-aligned anisotropic $k$ parity) .There exist positive reals $s_{i}>0$ $(i=1,\\ldots,d)$ such that the support of $P_{Z}$ (the distribution of $Z$ ) is given by $S:=\\{\\pm s_{1}\\}\\times\\{\\pm s_{2}\\}\\times\\cdots\\times\\{\\pm s_{d}\\}$ where $\\textstyle\\sum_{j=1}^{d}s_{j}^{2}=1$ , and $(z_{i})_{i=1}^{d}$ are mutually independent and $P(z_{i}=s_{i})=P(z_{i}=-s_{i})=1/2$ . The $k$ -sparse parity label corresponds to the sign of the product of $k$ -indices $I_{k}\\subset\\{1,\\ldots,d\\}$ .",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Mean-field two-layer network. Let $h_{x}(\\cdot):\\mathbb{R}^{d}\\rightarrow\\mathbb{R}$ be one neuron a ed with parameter $x=(x_{1},x_{2},x_{3})\\in\\mathbf{\\dot{R}}^{d+1+1}$ in a two-layer neural network: given an input $z\\in\\mathbb{R}^{d}$ ∈,",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{h_{x}(z)=\\bar{R}[\\operatorname{tanh}(z^{\\top}x_{1}+x_{2})+2\\operatorname{tanh}(x_{3})]/3,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $\\bar{R}\\in\\mathbb{R}$ is an output scale of the network and an extra tanh activation for e bias term $x_{3}\\in\\mathbb{R}$ is placed to make the fun $\\mathbb{R}^{\\bar{d}}$ on bou where $\\bar{d}=d+2$ and ing Suzuki et al. $\\mathcal{P}_{p}$ be the subset of (2023b ). Let $\\mathcal{P}$ with finite Pbe the set of Borel $p_{\\|}$ -th moment: $\\bar{\\mathbb{E}}_{\\mu}[\\|X\\|^{p}]<\\infty\\left(\\mu\\in\\mathcal{P}\\right)$ neurons ∥∥$h_{x}$ over ∞$\\mathbb{R}^{\\bar{d}}$ ∈P with the distribution . The mean-field neural network is defined by integrating infinitely many $\\mu\\in\\mathcal P$ :$\\begin{array}{r}{f_{\\mu}(\\cdot)=\\int h_{x}(\\cdot)\\mu(\\mathrm{d}x)}\\end{array}$ R·.",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Let $\\ell(\\cdot,\\cdot):\\mathbb{R}\\!\\times\\!\\mathbb{R}\\to\\mathbb{R}_{\\geq0}$ be a smooth binary cally, we consider the logistic loss function $\\ell(f,y)=\\log(1+\\exp(-y f))$ −where $f\\in\\mathbb{R},\\;y\\in\\{\\pm\\bar{1}\\}$ ∈∈{± }. We ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "also denote $\\ell(y f)=\\ell(f,y)$ Then, the empirical risk and the population risk of $f_{\\mu}$ are defined as ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{L(\\mu):=\\frac{1}{n}\\sum_{i=1}^{n}\\ell(y_{i}f_{\\mu}(z^{(i)})),\\;\\;\\bar{L}(\\mu):=\\mathbb{E}[\\ell(Y f_{\\mu}(Z))].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "To avoid overfitting, we consider zed empirical risk $F(\\mu):=L(\\mu)+\\lambda\\mathbb{E}_{X\\sim\\mu}[\\lambda_{1}\\|X\\|^{2}]$ with the regularization parameters $\\lambda,\\lambda_{1}\\ge0$ ≥. In addition, we introduce the entropy regularized risk: ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathcal{L}(\\mu)=F(\\mu)+\\lambda\\mathrm{Ent}(\\mu).\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array}{r}{\\int\\log(\\mu/\\nu)\\mathrm{d}\\mu}\\end{array}$ Ris the KL divergence between iately see that $\\mathcal{L}$ is equivalent to ν$L(\\mu)+\\lambda\\mathrm{KL}(\\nu,\\mu)$ and µ, and νis the Gaussian distribution with mean up to constant, where ${\\mathrm{KL}}(\\nu,\\mu)=$ and variance $I/(2\\lambda_{1})$ . A remarkable advantage of mean-field parameterization is that the above objectives become convex functional with respect to the distribution $\\mu$ , since $\\mu$ linearly acts on $f_{\\mu}$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3 MEAN -FIELD LANGEVIN DYNAMICS ",
+        "text_level": 1,
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The mean-field Langevin dynamics is defined by the following stochastic differential equation: ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathrm{d}X_{t}=-\\nabla\\frac{\\delta F(\\mu_{t})}{\\delta\\mu}(X_{t})\\mathrm{d}t+\\sqrt{2\\lambda}\\mathrm{d}W_{t},\\quad\\mu_{t}=\\mathrm{Law}(X_{t}),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "starting at $X_{0}\\sim\\mu_{0}$ , where $(W_{t})_{t\\geq0}$ is the $d$ -dimensional standard Brownian motion, and $\\frac{\\delta F(\\mu_{t})}{\\delta\\mu}$ is the first variation of $F$ , which, in our setting, is written as $\\begin{array}{r}{\\frac{\\delta F(\\mu)}{\\delta\\mu}(x)=\\frac{1}{n}\\sum_{i=1}^{n}\\ell^{\\prime}(y_{i}f_{\\mu}(z^{(i)})){y_{i}}h_{x}(z_{i})+}\\end{array}$ P$\\lambda(\\lambda_{1}\\|x\\|^{2})$ . The Fokker-Planck equation of SDE ( 4 ) is given by 1 ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\partial_{t}\\mu_{t}=\\lambda\\Delta\\mu_{t}+\\nabla\\cdot\\left[\\mu_{t}\\nabla\\frac{\\delta F(\\mu_{t})}{\\delta\\nu}\\right]=\\nabla\\cdot\\left[\\mu_{t}\\nabla\\left(\\lambda\\log(\\mu_{t})+\\frac{\\delta F(\\mu_{t})}{\\delta\\nu}\\right)\\right].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Several studies ( Mei et al. ,2018 ;$\\mathrm{Hu}$ et al. ,2019 ) showed that MFLD (4 )globally optimizes the objective ( 3 ), that is, when $t\\to\\infty$ we have ${\\mathcal{L}}(\\mu_{t})\\to{\\mathcal{L}}(\\mu_{[\\lambda]})$ , where $\\mu_{[\\lambda]}:=\\operatorname{argmin}_{\\mu\\in{\\mathcal{P}}}{\\mathcal{L}}(\\mu)$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "For a practical algorithm, we need to consider a space- and time-discretized version of the MFLD, that is, we approximate the solution $\\mu_{t}$ by an empirical measure $\\begin{array}{r}{\\mu_{\\mathcal{X}}=\\frac{1}{N}\\sum_{i=1}^{N}\\delta_{X_{i}}}\\end{array}$ Pcorresponding to a set of finite particles $\\mathcal{X}=(X^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}.$ et $\\mathcal{X}_{\\tau}=(X_{\\tau}^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}$ ⊂Nparticles at the $\\tau$ -th update $(\\tau\\in\\{0,1,2,\\ldots\\})$ , and define $\\mu_{\\tau}=\\mu_{\\mathcal{X}_{\\tau}}$ as a finite part xima of the population counterpart. Then, the discretized MFLD is defined as follows: $X_{0}^{i}\\sim\\mu_{0}$ ∼, and $\\mathcal{X}_{\\tau}$ is updated as ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{X_{\\tau+1}^{i}=X_{\\tau}^{i}-\\eta\\nabla\\frac{\\delta F(\\mu_{\\tau})}{\\delta\\mu}(X_{\\tau}^{i})+\\sqrt{2\\lambda\\eta}\\xi_{\\tau}^{i},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where (1 ), the discretized update $\\eta>0$ is the step size, (6 $\\xi_{\\tau}^{i}\\sim_{i.i.d.}N(0,I)$ )simply corresponds to the noisy gradient descent algorithm, where a ∼. Note that in the context of mean-field neural network Gaussian perturbation is added at each gradient step. We write $f_{\\mathcal{X}}:=f_{\\mu_{\\mathcal{X}}}$ for simplicity of notation. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.1 LOGARITHMIC SOBOLEV INEQUALITY ",
+        "text_level": 1,
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Nitanda et al. (2022 ); Chizat (2022 ) have established the exponential convergence of MFLD by exploiting the proximal Gibbs distribution $p_{\\mu}$ associated with $\\mu\\in\\mathcal P$ . The density of $p_{\\mu}$ is given by ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{p_{\\mu}(X)\\propto\\exp\\left(-\\frac{1}{\\lambda}\\frac{\\delta F(\\mu)}{\\delta\\mu}(X)\\right).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The smoothness of the loss function and the tanh activation guarantee the existence of the unique minimizer $\\mu^{*}$ of $\\mathcal{L}$ , which also solves the equation: $\\mu=p_{\\mu}$ (see Proposition 2.5 of Hu et al. (20 ). The key in their proofs is to show a logarithmic Sobolev inequality (LSI) on the Gibbs measure $p_{\\mu}$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Definition 2 (Logarithmic Sobolev inequality) .Let $\\mu$ be a Borel probability measure on $\\mathbb{R}^{d}$ . We say $\\mu$ satisfies the $L S I$ with a constant $\\alpha>0$ if for any smooth function $\\phi:\\mathbb{R}^{d}\\overset{}{\\rightarrow}\\mathbb{R}$ with $\\mathbb{E}_{\\mu}[\\phi^{2}]<\\infty$ ,",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathbb{E}_{\\mu}[\\phi^{2}\\log(\\phi^{2})]-\\mathbb{E}_{\\mu}[\\phi^{2}]\\log(\\mathbb{E}_{\\mu}[\\phi^{2}])\\leq\\frac{2}{\\alpha}\\mathbb{E}_{\\mu}[\\|\\nabla\\phi\\|_{2}^{2}].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "We can apply the classical Bakry-Emery and Holley-Stroock arguments ( Bakry and Émery ,1985 ;Holley and Stroock ,1987 ) to derive the LSI constant on the Gibbs distribution whose potential is the sum of the strongly convex function and bounded function. In particular, if establish the LSI for the proximal Gibbs distr the logistic loss is employed and each neuron $h_{x}$ is bounded by tion with $\\begin{array}{r}{\\alpha\\geq\\lambda_{\\frac{1}{2}}\\exp\\left({-4B/\\lambda}\\right).}\\end{array}$ ≥$\\bar{R}$ , we have −$\\begin{array}{r}{\\left\\|\\frac{\\delta L(\\mu)}{\\delta\\mu}\\right\\|_{\\infty}\\le B}\\end{array}$ ${\\dot{B}}={\\bar{R}}$ n our case, since and therefore , we can ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\alpha\\geq\\lambda_{1}\\exp\\left(-4\\bar{R}/\\lambda\\right).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3.2 QUANTITATIVE A NALYSIS OF MFLD ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Convergence guarantee. As shown in Chen et al. (2022 ); Suzuki et al. (2022 ), the LSI constant determines not only the convergence rate of the continuous dynamics, but also the number of particles (i.e., width of the neural network) to approximate the mean-field limit. Let us consider the linear functional of a distribution $\\mu^{(N)}$ of $N$ particles $\\mathcal{X}=(X^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}$ ⊂defined by ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\textstyle\\mathcal{L}^{N}(\\mu^{(N)})=N\\mathbb{E}_{\\mathcal{X}\\sim\\mu^{(N)}}[F(\\mu_{\\mathcal{X}})]+\\lambda\\mathrm{Ent}(\\mu^{(N)}).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Let $\\mu_{\\tau}^{(N)}$ be the distribution of particles $\\mathcal{X}_{\\tau}\\,=\\,(X_{\\tau}^{i})_{i=1}^{N}$ at the $\\tau$ -th iteration, and define $\\Delta_{\\tau}\\,=$ $\\begin{array}{r}{\\frac{1}{N}\\mathcal{L}^{N}(\\mu_{\\tau}^{(N)})-\\mathcal{L}(\\mu_{[\\lambda]})}\\end{array}$ .Suzuki et al. (2023a ) established the convergence rate of MFLD as follows. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Proposition 1. Let $\\begin{array}{r}{\\bar{B}^{2}:=\\mathbb{E}[\\|X_{0}^{i}\\|^{2}]\\!+\\!\\frac{1}{\\lambda\\lambda_{1}}\\!\\left[\\left(\\frac{1}{4}+\\frac{1}{\\lambda\\lambda_{1}}\\right)\\bar{R}^{2}\\!+\\!\\lambda d\\right]}\\end{array}$ h\u0010 i and $\\delta_{\\eta}:=C_{1}\\bar{L}^{2}(\\eta^{2}+\\lambda\\eta)$ ,where $\\bar{L}=2\\bar{R}+\\lambda\\lambda_{1}$ and $C_{1}=8(\\bar{R}^{2}+\\lambda\\lambda_{1}\\bar{B}^{2}+d)=O(d+\\lambda^{-1})$ . Then, i $f\\,\\lambda\\alpha\\eta\\leq1/4$ and $\\eta\\leq1/4$ ,then the neural network trained by MFLD converges to the optimal network $f_{[\\lambda]}$ as ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathbb{E}_{\\mathcal{X}_{\\tau}\\sim\\mu_{\\tau}^{(N)}}\\left[\\operatorname*{sup}_{z\\in\\operatorname{supp}(P_{Z})}(f_{\\mathcal{X}_{\\tau}}(z)-f_{\\mu_{[\\lambda]}}(z))^{2}\\right]\\le\\frac{4\\bar{L}^{2}}{\\lambda\\alpha}\\Delta_{\\tau}+\\frac{2}{N}\\bar{R}^{2},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\Delta_{\\tau}$ is further bounded by ∆$\\begin{array}{r}{\\Delta_{\\tau}\\leq\\exp\\left(-\\lambda\\alpha\\eta\\tau/2\\right)\\Delta_{0}\\!+\\!\\frac{2}{\\lambda\\alpha}\\bar{L}^{2}C_{1}\\left(\\lambda\\eta+\\eta^{2}\\right)+\\frac{4C_{\\lambda}}{\\lambda\\alpha N}.}\\end{array}$ ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array}{r}{O\\left(\\frac{1}{\\lambda\\alpha\\eta}\\log(1/\\epsilon^{*})\\right)}\\end{array}$ In particular, for a given \u0010\u0011iterations with the step size $\\epsilon^{*}\\;>\\;0$ , the right hand side can be bounded by $\\eta\\,=\\,O\\big(\\lambda\\alpha^{2}\\epsilon^{*}/C_{1}\\,+\\,\\lambda\\alpha\\sqrt{\\epsilon^{*}/C_{1}}\\big)$ \u0000p$\\epsilon^{*}\\,+\\,\\frac{2\\bar{R}^{2}}{N}$ \u0001. In terms of after $T\\,=$ generalization error (Proposition 2 ), the optimization error can be set as $\\epsilon^{*}=O(1/(n\\lambda)^{2})$ . Then, the required total number of iteration $T$ and the number of particles $N$ can be bounded by ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\nT\\leq{\\cal O}\\left((d+\\lambda^{-1})n^{2}\\exp(16\\bar{R}/\\lambda)\\log(n\\lambda)\\right),\\;\\;N\\leq{\\cal O}((\\epsilon^{*}\\lambda\\alpha)^{-2})={\\cal O}\\left(n^{2}\\exp(8\\bar{R}/\\lambda)\\right).\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "From this evaluation, we see that it is crucial to select the regularization strength $\\lambda$ so that the loss is sufficiently small. In the following section, we investigate how structured data affects the choice of $\\lambda$ .",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Generalization error bound. Now we state the classification error bound of the neural network optimized by MFLD. For this purpose, we introduce the following assumption which will be verified later on for the anisotropic parity setting. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Assumption 1. There exists $c_{0}>0$ and $R>0$ such that the following conditions are satisfied: ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "•There exists $\\mu^{*}\\in\\mathcal{P}$ such that $\\mathrm{KL}(\\nu||\\mu^{*})\\leq R$ and $L(\\mu^{*})\\leq\\ell(0)-c_{0}$ .  \n•For any $\\lambda<c_{0}/R$ , the risk minimizer $\\mu_{[\\lambda]}$ of $\\mathcal{L}(\\mu)$ satisfies $Y f_{\\mu_{[\\lambda]}}(X)\\geq c_{0}$ almost surely. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Here $c_{0}$ characterizes the margin of a solution $\\mu^{*}$ and $R$ controls “difficulty” of the problem. Indeed, if larger $R$ is required, the Bayes optimal solution should be far away from the prior $\\nu$ . Hence, we expect that obtaining a good classifier is more difficult. Let $\\hat{\\mu}$ be an approximately optimal solution of $\\mathcal{L}$ with $\\epsilon^{*}$ accuracy: $\\begin{array}{r}{\\mathcal{L}(\\hat{\\mu})\\leq\\operatorname*{min}_{\\mu\\in\\mathcal{P}}\\mathcal{L}(\\mu)+\\epsilon^{*}}\\end{array}$ ; we have the following generalization error bounds. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Proposition 2 (Suzuki et al. (2023b )) .Let $M_{0}=(\\epsilon^{*}+2(\\bar{R}+1))/\\lambda$ and suppose that $\\lambda<c_{0}/R$ .",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "(i) If the sample size nsatisfies ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{n>C\\frac{\\bar{R}^{2}}{c_{0}^{2}\\lambda^{2}}\\left[\\lambda\\left(\\bar{R}+\\frac{\\lambda}{\\bar{R}^{2}n}\\right)+\\bar{R}^{2}(1+\\log\\log_{2}(n^{2}M_{0}\\bar{R}))+n\\lambda\\epsilon^{*}\\right]=:S,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "with an absolute constant $C$ , then $f_{\\hat{\\mu}}$ satisfies $P\\left(Y f_{\\hat{\\mu}}(Z)\\leq0\\right)=0$ (the Bayes optimal classifier) with probability $1-\\exp(-\\textstyle{\\frac{n\\lambda^{2}}{32\\bar{R}^{4}}}(c_{0}^{2}-S/n))$ .",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "(ii) When the sample size does not satisfy the condition $n>S$ , we still have an alternative error bound: there exists an absolute constant $C>0$ such that ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{P(Y f_{\\hat{\\mu}}(Z)\\leq0)\\leq C\\beta(c_{0})\\left[\\frac{\\bar{R}^{2}}{n\\lambda}\\left(1+t+\\log\\log_{2}(n^{2}M_{0}\\bar{R})\\right)+\\frac{1}{n}\\left(\\bar{R}+\\frac{\\lambda}{\\bar{R}^{2}n}\\right)+\\epsilon^{*}\\right],}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\exp(-t)$ , where $\\beta(c_{0}):=1/[\\ell(0)-(\\ell(c_{0})-c_{0}\\ell^{\\prime}(c_{0}))].$ .",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "This result states that if we take the regulariz $\\lambda$ ufficiently small as $\\lambda<\\mathcal{O}(1/R)$ , then for sufficiently large sample size such that $n>\\bar{S}=\\Omega(1/\\lambda^{2})$ , we have an exponential convergence of the expected clas $\\mathbb{E}_{D^{n}}[P(Y f_{\\hat{\\mu}}(Z)\\overset{,}{\\le}0)]\\le\\exp(-\\Omega(n\\hat{\\lambda^{2}}))$ ; otherwise, we sill have a linear decay convergence rate is $\\mathbb{E}_{D^{n}}[P(Y f_{\\hat{\\mu}}(Z)\\le0)]\\overset{\\cdot}{=}\\mathcal{O}(1/(n\\lambda))$ most completely characterized by ≤ORthrough the choice of . Hence, the classif $\\lambda=\\mathcal{O}(1/R)$ Oand its : for a problem with large R, we need to pay greater sample complexity. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "It is also worth noting that the value of $R$ affects not only the statistical complexity but also the computational complexity. Remember that the number of iterations $T$ and the network width $N$ also depend $\\lambda$ deed, by taking $\\lambda=c_{0}/R$ , we arrive at $T={\\mathcal{O}}(\\exp(16{\\bar{R}}R/c_{0})\\log(n))$ and $N={\\mathcal{O}}(\\exp(8{\\bar{R}}R/c_{0}))$ , which has exponential dependence on R.",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Therefore, the goal of the subsequent sections is to answer the following question in the affirmative: ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Can we utilize the anisotropy of input data to reduce the value of $R$ ,hence improving the statistical and computational complexity of MFLD? ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4MAINRESULT: LEARNING UNDERSTRUCTUREDDATA4.1 STATISTICAL AND COMPUTATIONAL COMPLEXITY FOR ANISOTROPIC DATA Now we analyze how the anisotropic property of the input affects the generalization error and the computational complexity through the aforementioned measure of problem difficulty $R$ . We first present a framework for the general problem setting in Definition 1 . Let $\\tilde{\\boldsymbol{\\phi}}=(\\tilde{\\phi}_{1},\\dots,\\tilde{\\dot{\\phi}}_{d})^{\\top}\\in\\mathbb{R}^{d}$ as ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\tilde{\\phi}_{i}=\\left\\{\\!\\!\\begin{array}{l l}{\\sqrt{d}}&{(i\\in I_{k}),}\\\\ {0}&{(i\\notin I_{k}).}\\end{array}\\right.\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Then, we have the following proposition that controls $R$ in terms of the transformation matrix $A$ .",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Pro sition 3. Define $\\phi:=A^{-1}\\tilde{\\phi}$ where $\\tilde{\\phi}$ is defined by Eq. (9 ). For $\\bar{R}=k$ , there exists $\\mu^{*}\\in\\mathcal{P}$ and Rsuch that ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathrm{KL}(\\nu||\\mu^{*})\\leq R=c_{1}(\\|\\phi\\|^{2}+k^{2})\\log(k)^{2},\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "and $L(\\mu^{*})\\leq\\ell(0)-c_{2}$ , where $c_{1},c_{2}>0$ are absolute constants. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Under the conditions in this proposition, we can show that the minimizer of the MFLD objective achieves the Bayes optimal classifier with a positive margin as follows. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Prop ition .Assume that there exis $\\mu^{*}\\in\\mathcal{P}$ such that the conditions in Propo itio with Rand $\\bar{R}$ in the statement. Then, if we choose the regulaization parameter λas $\\lambda<c_{2}/(2R)$ ,then the minimizer $\\mu_{[\\lambda]}$ of the MFLD objective satisfies ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\operatorname*{max}\\{\\bar{L}(\\mu_{[\\lambda]}),L(\\mu_{[\\lambda]})\\}<\\ell(0)-\\frac{c_{2}}{2},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "and $f_{\\mu_{[\\lambda]}}$ is a perfect classifier with margin $c_{2}$ , i.e., $\\begin{array}{r}{Y f_{\\mu_{[\\lambda]}}(Z)\\ge\\frac{c_{2}}{2}}\\end{array}$ almost surely. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The proofs of both propositions can be found in Appendix A in the appendix. These general results state that Assumption 1 is satisfied for the general problem setting in Definition 1 . Now we consider special cases where concrete sample complexity and computational complexity can be derived. For example, we have the following evaluation for the $k$ -sparse parity with anisotropic covariance. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Example: Anisotropic $k$ -sparse parity. In the $k$ -parity setting (Example 2 ), Assumption 1 is satisfied with constants specified in the following propositions, which follow from Proposition 4 .",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Corollary 1 (Anisotropic $k$ -sparse parity) .Suppose that $(Z,Y)$ is generated from the anisotropic $k$ parity problem (Example 2 ). Then, for ${\\bar{R}}=k$ , there exists $\\mu^{*}\\in\\mathcal{P}$ satisfying $\\mathrm{KL}(\\nu||\\mu^{*})\\leq R$ where ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\nR=c_{1}\\biggl(\\sum_{i\\in I_{k}}s_{i}^{-2}\\biggr)\\log(k)^{2},\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "and $L(\\mu^{*})\\leq\\ell(0)-c_{2}$ , where $c_{1},c_{2}>0$ are absolute constants. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "This result highlights the benefit of structured data. Observe that isotropic covariance corresponds to $s_{i}=1/\\sqrt{d}\\left(i=1,\\ldots,d\\right)$ , where $R$ needs to be $\\tilde{\\mathcal{O}}(k d)$ , which then leads to exponential dimension dependency in the computational complexity, and also dimension-dependent sample complexity, as shown in Suzuki et al. (2023b ). On the other hand, if the input covariance is anisotropic so that $s_{j}^{2}>\\Omega(1/k)$ for $j\\in I_{k}$ (i.e., the input $Z_{j}$ is large for the informative coordinates $j\\in I_{k}$ and other coordinates are small), then the value of $R$ becomes dimension-free: $R=\\mathcal{O}(k^{2}\\log(k)^{2})$ .",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Substituting the values of $R$ and $\\bar{R}$ to the generalization error and computational complexity bounds, we obtain the following corollary. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Theorem 1 ($k$ -sparse parity setting) .Define $\\begin{array}{r}{S_{I_{k}}^{2}:=\\sum_{j\\in I_{k}}s_{j}^{-2}}\\end{array}$ . Under the same setup as Corollary $^{\\,l}$ , we may take $R=O(S_{I_{k}}^{2}\\mathrm{log}(k)^{2})$ ,${\\bar{R}}=k$ and $\\lambda=\\mathcal{O}(1/R)=O(1/(S_{I_{k}}^{2}\\log(k)^{2}))$ ∈so that the classification error is bounded by ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP(Y f_{\\mu_{[\\lambda]}}<0)\\leq O\\left(\\frac{k S_{I_{k}}^{2}\\log(k)^{2}}{n}(\\log(1/\\delta)+\\log\\log(n))\\right),\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\delta$ . Moreover, if $\\dot{\\boldsymbol{n}}=\\Omega(k^{4}S_{I_{k}}^{4}\\log(k)^{4})$ , then $P(Y f_{\\mu_{[\\lambda]}}\\leq0)=0$ with probability ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\n1-\\exp[-\\Omega(n/(k^{4}S_{I_{k}}^{4}\\log(k)^{4}))].\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "For the computational cost, it suffices to take the number of iterations $T$ and network width $N$ as ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\nT=O(S_{I_{k}}^{2}\\log(k)^{2}n\\log(n d)\\exp[O(k S_{I_{k}}^{2}\\log(k)^{2})]),\\;\\;N=O(n^{2}\\exp(O(k S_{I_{k}}^{2}\\log(k)^{2}))))\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "respectively, to achieve the same statistical complexity as described above. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "As mentioned above, for sufficiently anisotropic data such that $S_{I_{k}}^{2}=k^{2}$ , the computational complexity becomes completely polynomial order with respect to the dimension $d$ ; this is in stark contrast to the isotropic setting, where the complexity has exponential order with respect to $d$ .",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Now we provide two examples of the $k$ -parity problem in Example 2 (i.e., $I_{k}=\\{1,\\ldots,k\\})$ ) where covariance structure allows us to smoothly interpolate between the isotropic and anisotropic setting. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "•Power-law decay. We set ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\ns_{i}^{2}=c_{d}i^{-\\alpha},c_{d}=\\Theta(d^{1-\\alpha}),\\,\\,\\,\\mathrm{where}\\,\\,\\alpha\\in[0,1)\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We have that $S_{I_{k}}^{2}=\\mathcal{O}(d^{1-\\alpha})$ leading to $R=\\mathcal{O}(k^{1+\\alpha}d^{1-\\alpha}\\log(k)^{2})$ . This interpolates between the isotropic and the completely anisotropic setting $S_{I_{k}}^{2}=k^{2}$ by adjusting $\\alpha$ between $(0,1)$ .",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "•Spiked covariance. Similar to Ghorbani et al. (2020 ); Ba et al. (2023 ), we set ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\ns_{i}^{2}=\\Theta(d^{\\alpha-1})\\;\\mathrm{for}\\;i\\in I_{k},\\;\\;s_{i}=\\Theta(d^{-1})\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "In this case we have $R=k d^{1-\\alpha}\\log(k)^{2}$ , which becomes dimension-free when $\\alpha$ approaches 1. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Remark 1. For the spiked covariance setting above, the computational and statistical complexity of MFLD is governed by the effective dimensions $d_{e f f}=d^{1-\\alpha}$ defined in Ghorbani et al. (2020 ). As the input becomes more anisotropic, $d_{e f\\!f}$ decreases and hence the learning problem becomes easier. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.2 ENHANCING A NISOTROPY VIA COORDINATE TRANSFORM ",
+        "text_level": 1,
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "From the previous analysis, we see that anisotropic data can indeed improve both the statistical and computational complexity. This being said, it is worth noting that unless the problem is sufficiently anisotropic such that $R$ becomes cost, the computational cost would still be super-polynomial in terms of dimension dependence. The goal of this section is to show that the computational complexity can be further improved by exploiting the anisotropy of the learning problem. Specifically, we utilize the gradient covariance matrix to estimate the informative subspace, similar to the one-step gradient feature learning procedure studied in Ba et al. (2022 ); Damian et al. (2022 ); Barak et al. (2022 ). ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Let $\\sigma(w^{\\top}z)=h_{x}(z)$ for $(x_{1},x_{2},x_{3})=(w,b_{1},b_{2})$ for fixed $b_{1}$ and $b_{2}$ . We initialize the particles $\\mathcal{X}_{0}=\\{(w_{l},b_{1},b_{2})\\}_{l=1}^{N/2}\\cup\\{(-w_{l},-b_{1},-b_{2})\\}_{l=1}^{N/2}$ ∪{ −−−}by generating $w_{l}$ from the uniform distribution $\\mathcal{U}(\\boldsymbol{B}_{c_{0}})$ UBon the ball with sufficiently small radius c$c_{0}>0$ . The gradient for each neuron is given as ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\ng(w_{l})=\\frac{1}{n}\\sum_{i=1}^{n}\\ell^{\\prime}(y_{i}f_{\\mathcal{X}_{0}}(z^{(i)}))y_{i}z\\sigma^{\\prime}(w_{l}^{\\top}z^{(i)}).\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Note that we have $f_{\\mathcal{X}_{0}}(Z)=0$ almost surely. We then calculate the covariance as ",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{G=\\frac{1}{N}\\sum_{l=1}^{N}g(w_{l})g(w_{l})^{\\top},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "to estimate the informative subspace. Define the “regularized covariance\" $\\hat{G}=G+\\hat{\\lambda}_{0}I$ . For this choice of $\\hat{G}$ , we apply the following coordinate transform to the input $Z$ :",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{Z}\\leftarrow c_{A}\\hat{G}^{1/2}Z,\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "where $c_{A}$ is a scaling parameter so that $\\|\\hat{Z}\\|\\leq1$ almost surely. We denote by $\\hat{z}_{i}\\,=\\,c_{A}\\hat{G}^{1/2}z_{i}$ accordingly. After the transformation, we train the neural network via MFLD; that is, we optimize the objective $\\begin{array}{r}{\\stackrel{{\\wedge}}{\\mu}\\mapsto\\frac{1}{n}\\sum_{i=1}^{n}\\ell(f_{\\mu}(\\hat{z}_{i})y_{i})\\!+\\!\\lambda(\\lambda_{1}\\mathbb{E}_{\\mu}[\\|X\\|^{2}]\\!+\\!\\mathrm{Ent}(\\mu))}\\end{array}$ P. Intuitively, this coordinate t amplifies the informative coordinates $(j\\in I_{k})$ ∈)and suppress the non-informative coordinate $(j\\notin I_{k})$ ̸∈ .Hence the covariance of the input features becomes more well-specified to the target signal Yleading to a better LSI constant. We remark that such coordinate transformation is equivalent to employing an anisotropic weight decay regularization on the weight parameters $r(x)=\\|x\\|_{\\hat{G}^{-1}}^{2}$ .",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Taken into account the sample complexity to estimate the gradient covariance, we obtain the following evaluation of the KL divergence between the prior distribution $\\nu$ and a Bayes optimal solution $\\mu^{*}$ .",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Theorem 2. Assume that $d\\operatorname*{max}_{j^{\\prime}\\in I_{k}^{c}}s_{j^{\\prime}}^{2}=O(1)$ . Suppose that $c_{\\mathrm{0}}$ is taken sufficiently small such that $\\begin{array}{r}{\\sum_{j=1}^{d}w_{j}^{2}s_{j}^{2}\\le1}\\end{array}$ almost surely for $w\\sim\\mathcal{U}(B_{c_{0}})$ and ${\\mathbb E}[|w_{j}|]=\\Theta(1)^{2}$ , and the regularization parameter $\\hat{\\lambda}_{0}$ is set be $\\begin{array}{r}{\\hat{\\lambda}_{0}=\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\cdot\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}}\\end{array}$ . We assume that the sample size nand the number of particles Nsatisfies ∈",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\nn\\ge C_{k}\\frac{k d\\bar{R}^{2}\\log(2N/\\delta)^{2}}{\\prod_{j^{\\prime}\\in{\\cal I}_{k}}s_{j^{\\prime}}^{2}},\\,\\,\\,N\\ge C_{k}\\frac{k^{2}d^{2}\\log(d/\\delta)}{\\operatorname*{max}_{j^{\\prime}\\notin{\\cal I}_{k}}s_{j^{\\prime}}^{4}},\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "given $\\delta\\in(0,1)$ ere $C_{k}$ is a g on $k$ $\\bar{R}=k$ and sufficiently small $C_{k}$ , there exists $\\mu^{*}\\in\\mathcal{P}$ ∈P such that $L(\\mu^{*})\\leq\\ell(0)-c_{2}$ ≤−and $\\mathrm{KL}(\\nu||\\mu^{*})\\leq R$ || ≤where ",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\nR=c_{1}k^{2}\\left(\\frac{\\operatorname*{max}_{j^{\\prime}\\in[d]}s_{j^{\\prime}}^{2}}{\\operatorname*{min}_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}}+1\\right)\\log(k)^{2},\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "for a constant $c_{1}$ independent of the dimensionality $d$ , with probability $1-\\delta$ . Here, the ility is with respect to the randomness of training data and generating the initial parameters $(w_{l})_{l=1}^{N}$ .",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We make the following remarks on the theorem. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "•This theorem implies a significant improvement on the LSI constant since $R$ is independent of $d$ as long as $\\frac{\\operatorname*{max}_{j^{\\prime}\\in[d]}s_{j^{\\prime}}^{2}}{\\operatorname*{min}_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}}=\\mathcal{O}(1)$ , which is satisfied even for the isotropic setting. The dimension-free $R$ then implies that no exponential dependence is present in the computational complexity. Moreover, the runtime and the network width both “decouples” $k$ from the exponent in dimension dependence. •In order to accurately estimate the gradient matrix, there is an additional cost in the statistical complexity. For the isotropic setting, (11 )implies a sample complexity of $n=\\Omega(d^{k+1})$ , which matches the total sample size in the stochastic gradient descent procedure as in Barak et al. (2022 ). •If the input is anisotropic so that $\\begin{array}{r}{\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\;\\gg\\;d^{-k}}\\end{array}$ Q, then the sample complexity to estimate the informative direction is also improved. For instance, in the spiked setting (10 ), the sample complexity is improved to $n\\asymp d^{(1-\\bar{\\alpha})k}d=d_{\\mathrm{eff}}^{k}d$ , and in the most extreme case, when the signal is well-specified by the principle components (i.e., denominator is $\\Omega(1))$ , the complexity becomes linear in $d$ . This observation also demonstrates the benefit of structured data in feature learning. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Tradeoff between statistical and computational complexity. By comparing the complexity derived in Theorem 1 and Theorem 2 , we observe a tradeoff between the statistical and computational complexity: estimating the gradient covariance matrix requires additional samples, but consequently the required width and iterations of MFLD significantly decrease. An interesting question is whether such tradeoff naturally occurs in more general data settings and feature learning procedures. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "5 KERNEL LOWER BOUND FOR ANISOTROPIC PARITY ",
+        "text_level": 1,
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "To complement our feature learning results, in this section we prove a classification lower bound for kernel methods on the (axis-aligned) anisotropic $k$ -parity problem in Example 2 in a spiked covariance setting. We assume $\\begin{array}{r}{y=y(z)=\\mathrm{sign}(\\prod_{i=1}^{k}z_{i})}\\end{array}$ , and for $k^{*}\\leq k$ , the input features satisfy ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\n|z_{i}|=d^{\\alpha/2}\\;\\mathrm{for}\\;i=1,\\cdot\\cdot\\cdot\\;,k^{*}.\\qquad|z_{i}|=1\\;\\mathrm{for}\\;i=k^{*}+1,\\cdot\\cdot\\cdot\\;,d.\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "This is to say, the first $k^{*}$ coordinates of the $k$ -parity target function are aligned with the prominent directions of the input, but the target can also depend on an additional $k-k^{*}$ coordinates that are not amplified. It is clear that the following two settings are special cases of the above definition: ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "(i )$\\alpha=0$ : isotropic data. (ii )$k=k^{*}$ : the (well-specified) spiked covariance model in ( 10 ). ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We emphasize that most existing kernel lower bounds are tailored for regression with the squared error ( Ghorbani et al. ,2020 ;Hsu ,2021 ;Abbe et al. ,2022 ). Even for the simplest isotropic setting $(i)$ , to our knowledge the only classification lower bound for the parity problem is given in Wei et al. (2019 ) which only handles the $k=2$ case (XOR). ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Our lower bound applies to rotationally invariant kernels: $K(z,z^{\\prime})=h(\\|z\\|,\\|z^{\\prime}\\|,\\langle z,z^{\\prime}\\rangle)$ as considwe may restrict ourselves to a positive semidefinite inner-product kernel which can be written as ered in El Karoui (2010 ); Donhauser et al. (2021 ). In the hypercube setting, ∥$\\|z\\|$ ∥is fixed, and hence ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{K(z,z^{\\prime})=\\sum_{l=0}^{\\infty}\\gamma_{l}\\left(\\frac{\\langle z,z^{\\prime}\\rangle}{d}\\right)^{l},\\quad\\{\\gamma_{l}\\}_{l=0}^{\\infty}\\colon\\mathrm{non-negative~and~bounded}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Note that this covers the a wide range of NTK of fully-connected NNs ( Liang et al. ,2020 ;Donhauser et al. ,2021 ). Given $n$ i.i.d. samples, we construct the kernel estimator $f_{\\beta}(z)$ with $\\beta\\in\\mathbb{R}^{n}$ chosen arbitrarily: $\\begin{array}{r}{f_{\\beta}(z)=\\sum_{i=1}^{n}\\beta_{i}K(z,z^{(i)})}\\end{array}$ . We have the following classification error lower bound. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Theorem 3. Consider the spiked covariance setting in (12 ). Given any fixed $\\delta>0,$ , if the sample size ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\nn\\lesssim d^{\\lfloor(1-\\alpha)k^{*}\\rfloor+k-k^{*}-\\delta},\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "$d$ with probability at least 0 .99 ove samples, for all choices of $\\beta\\in\\mathbb{R}^{n}$ ,$\\begin{array}{r}{f_{\\beta}(\\boldsymbol{\\bar{z}})=\\sum_{i=1}^{n}\\beta_{i}K(\\boldsymbol{\\bar{z}},\\boldsymbol{z}^{(i)})}\\end{array}$ will misclassify the sign of yat $\\Omega(1)$ fraction of the time, that is, ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{P}_{z\\sim P_{Z}}\\left[f_{\\beta}(z)y<0\\right]=\\Omega(1).\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "The proof can be found in Appendix C. First, we lower bound the failure probability by the probability $y K(z,z^{(i)})$ that $\\bar{|f_{\\beta}(z)|}$ . Then we reduce the problem to controlling the lowest eigenvalue of some kernel matrix. is large, by extending Wei et al. (2019 ) based on finer evaluation on the correlation We make the following remarks on the kernel lower bound. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "•Recall that $\\alpha\\in(0,1)$ con nisotropy of input features. When $\\alpha\\rightarrow0$ , the input becomes isotropic, and we obtain a error, which matches the regression lower bound in $n\\asymp d^{k-\\delta}$ ≍lower bound on the sample complexity for the classification Ghorbani et al. (2019 ). ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "•In the “well-specified” setting where $k=k^{*}$ as in (10 ), the kernel sample complexity simplifies to $n\\asymp d^{(1-\\alpha)k}=d_{\\mathrm{eff}}^{k}$ which is strictly worse than that of MFLD given in Theorem 1 for $k>1$ . On the other hand, the required sample size is $d$ times better than the covariance estimation procedure in Theorem 2 (although we believe the factor $d$ stems from a technical artifact of the proof); however, in terms of computational complexity at test time, the kernel estimator needs to store $n$ training points which scales with $d^{k}$ , whereas for the NN we only need to store poly $(d,k)$ neurons, which decouples the degree $k$ in the exponent of the dimension dependence. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 EXPERIMENT ",
+        "text_level": 1,
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We validate our theoretical analysis by numerical experiments. We consider the anisotropic 3 -sparse parity problem: $y=z_{1}z_{2}z_{3}$ ,$s_{1}=s_{2}=s_{3}=\\kappa/\\sqrt{d}$ , and $s_{4}=\\cdots=1/\\sqrt{d}$ . We fixed $d=300$ and varied $n$ and $\\kappa$ to train the neural network (2 )with the logistic loss. More details are in Appendix D.",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "In Figure 1 we plot the test accuracy as a function of the sample size $n$ and $\\kappa$ , which controls the level of anisotropy. As clearly seen, increasing $\\kappa$ enables smaller the model to learn the problem with smaller sample complexity $n$ ,which demonstrates how anisotropy helps learning. Moreover, let us focus on the “phase transition” boundary between yellow and blue regions. According to Theorem 1 , the classification error is bounded by $\\textstyle\\sum_{j\\in I_{k}}s_{j}^{-2}/n=\\kappa^{-2}d/n$ up to a constant, which predicts that there would be ∈a boundary around $\\kappa^{2}=\\Theta(n)$ , as indicated by the red line in the figure. We therefore conclude that the empirical findings match the theoretical result in Theorem 1 .",
+        "page_idx": 9
+    },
+    {
+        "type": "image",
+        "img_path": "images/f00bd5efa97f3543d3694c3b6f362ad9a958ff858a3fdeb77ce2d69b466f2503.jpg",
+        "img_caption": [
+            "Figure 1: Test accuracy of NN trained by MFLD to learn an anisotropic $d$ -dimensional 3-parity problem. "
+        ],
+        "img_footnote": [],
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "7 CONCLUSION ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "We studied the interplay between structured data (in the form of input anisotropy) and the efficiency of feature learning in the context of classifying $k$ -sparse parity using two-layer neural network optimized by noisy gradient descent (mean-field Langevin dynamics). We showed that anisotropy can improve both the statistical and computational complexity of MFLD, leading to a separation from kernel methods (including neural networks in the NTK regime). Interesting future directions include $(i)$ extending this observation to a more general class of target functions, $(i i)$ improving the sample complexity to obtain the covariance estimator in Theorem 2 , and $(i i i)$ deriving a more precise description on the tradeoff between statistical and computational complexity in NN training. ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "A CKNOWLEDGEMENTS ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "TS was partially supported by JSPS KAKENHI (20H00576) and JST CREST (JPMJCR2115, JPMJCR2015). KO was partially supported by JST, ACT-X Grant Number JPMJAX23C4, JAPAN. AN was partially supported by JSPS KAKENHI (22H03650). ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "REFERENCES ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "E. Abbe, E. B. Adsera, and T. Misiakiewicz. The merged-staircase property: a necessary and nearly sufficient condition for sgd learning of sparse functions on two-layer neural networks. In Conference on Learning Theory , pages 4782–4887. PMLR, 2022.   \nE. Abbe, E. Boix-Adsera, and T. Misiakiewicz. SGD learning on neural networks: leap complexity and saddle-to-saddle dynamics. arXiv preprint arXiv:2302.11055 , 2023.   \nJ. Ba, M. A. Erdogdu, T. Suzuki, Z. Wang, D. Wu, and G. Yang. High-dimensional asymptotics of feature learning: How one gradient step improves the representation. In A. H. Oh, A. Agarwal, D. Belgrave, and K. Cho, editors, Advances in Neural Information Processing Systems , 2022. URL https://openreview.net/forum?id=akddwRG6EGi .  \nJ. Ba, M. A. Erdogdu, T. Suzuki, Z. Wang, and D. Wu. Learning in the presence of low-dimensional structure: a spiked random matrix perspective. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023.   \nD. Bakry and M. Émery. Diffusions hypercontractives. In J. Azéma and M. Yor, editors, Séminaire de Probabilités XIX 1983/84 , pages 177–206, Berlin, Heidelberg, 1985. Springer Berlin Heidelberg. ISBN 978-3-540-39397-9.   \nB. Barak, B. L. Edelman, S. Goel, S. M. Kakade, eran malach, and C. Zhang. Hidden progress in deep learning: SGD learns parities near the computational limit. In A. H. Oh, A. Agarwal, ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "D. Belgrave, and K. Cho, editors, Advances in Neural Information Processing Systems , 2022. URL ",
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "https://openreview.net/forum?id $=$ 8XWP2ewX-im .  \nG. Ben Arous, R. Gheissari, and A. Jagannath. High-dimensional limit theorems for sgd: Effective dynamics and critical scaling. Advances in Neural Information Processing Systems , 35:25349– 25362, 2022.   \nA. Bietti, J. Bruna, C. Sanford, and M. J. Song. Learning single-index models with shallow neural networks. In Advances in Neural Information Processing Systems , 2022.   \nF. Chen, Z. Ren, and S. Wang. Uniform-in-time propagation of chaos for mean field langevin dynamics. arXiv preprint arXiv:2212.03050 , 2022.   \nL. Chizat. Mean-field langevin dynamics : Exponential convergence and annealing. Transactions on Machine Learning Research , 2022. URL https://openreview.net/forum?id= BDqzLH1gEm .  \nL. Chizat and F. Bach. On the global convergence of gradient descent for over-parameterized models using optimal transport. In Advances in Neural Information Processing Systems 31 , pages 3040–3050, 2018.   \nL. Chizat and F. Bach. Implicit bias of gradient descent for wide two-layer neural networks trained with the logistic loss. arXiv preprint arXiv:2002.04486 , 2020.   \nA. Damian, J. Lee, and M. Soltanolkotabi. Neural networks can learn representations with gradient descent. In P.-L. Loh and M. Raginsky, editors, Proceedings of Thirty Fifth Conference on Learning Theory , volume 178 of Proceedings of Machine Learning Research , pages 5413–5452. PMLR, 02–05 Jul 2022. URL https://proceedings.mlr.press/v178/damian22a.html .  \nA. Daniely and E. Malach. Learning parities with neural networks. arXiv preprint arXiv:2002.07400 ,2020.   \nK. Donhauser, M. Wu, and F. Yang. How rotational invariance of common kernels prevents generalization in high dimensions. In International Conference on Machine Learning , pages 2804–2814. PMLR, 2021.   \nN. El Karoui. The spectrum of kernel random matrices. The Annals of Statistics , 38(1):1–50, 2010.   \nI. K. Fodor. A survey of dimension reduction techniques. Technical report, Lawrence Livermore National Lab., CA (US), 2002.   \nS. Frei, N. S. Chatterji, and P. L. Bartlett. Random feature amplification: Feature learning and generalization in neural networks. arXiv preprint arXiv:2202.07626 , 2022.   \nB. Ghorbani, S. Mei, T. Misiakiewicz, and A. Montanari. Linearized two-layers neural networks in high dimension. arXiv preprint arXiv:1904.12191 , 2019.   \nB. Ghorbani, S. Mei, T. Misiakiewicz, and A. Montanari. When do neural networks outperform kernel methods? arXiv preprint arXiv:2006.13409 , 2020.   \nT. Hastie, R. Tibshirani, J. H. Friedman, and J. H. Friedman. The elements of statistical learning: data mining, inference, and prediction , volume 2. Springer, 2009.   \nR. Holley and D. Stroock. Logarithmic sobolev inequalities and stochastic ising models. Journal of statistical physics , 46(5-6):1159–1194, 1987.   \nD. Hsu. Dimension lower bounds for linear approaches to function approximation. Daniel Hsu’s homepage , 2021.   \nK. Hu, Z. Ren, D. Siska, and L. Szpruch. Mean-field langevin dynamics and energy landscape of neural networks. arXiv preprint arXiv:1905.07769 , 2019.   \nZ. Ji and M. Telgarsky. Polylogarithmic width suffices for gradient descent to achieve arbitrarily small test error with shallow relu networks. arXiv preprint arXiv:1909.12292 , 2019. ",
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "T. Liang, A. Rakhlin, and X. Zhai. On the multiple descent of minimum-norm interpolants and restricted lower isometry of kernels. In Conference on Learning Theory , pages 2683–2711. PMLR, 2020. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "S. Mei, A. Montanari, and P.-M. Nguyen. A mean field view of the landscape of two-layer neural networks. Proceedings of the National Academy of Sciences , 115(33):E7665–E7671, 2018. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "S. Mei, T. Misiakiewicz, and A. Montanari. Generalization error of random feature and kernel methods: Hypercontractivity and kernel matrix concentration. Applied and Computational Harmonic Analysis , 59:3–84, 2022. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "T. Misiakiewicz. Spectrum of inner-product kernel matrices in the polynomial regime and multiple descent phenomenon in kernel ridge regression. arXiv preprint arXiv:2204.10425 , 2022. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A. Mousavi-Hosseini, S. Park, M. Girotti, I. Mitliagkas, and M. A. Erdogdu. Neural networks efficiently learn low-dimensional representations with sgd. In The Eleventh International Conference on Learning Representations , 2022. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A. Mousavi-Hosseini, D. Wu, T. Suzuki, and M. A. Erdogdu. Gradient-based feature learning under structured data. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A. Nitanda and T. Suzuki. Stochastic particle gradient descent for infinite ensembles. arXiv preprint arXiv:1712.05438 , 2017. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "A. Nitanda, D. Wu, and T. Suzuki. Convex analysis of the mean field langevin dynamics. In G. CampsValls, F. J. R. Ruiz, and I. Valera, editors, Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151 of Proceedings of Machine Learning Research ,pages 9741–9757. PMLR, 28–30 Mar 2022. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "R. O’Donnell. Analysis of boolean functions . Cambridge University Press, 2014. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "P. Pope, C. Zhu, A. Abdelkader, M. Goldblum, and T. Goldstein. The intrinsic dimension of images and its impact on learning. arXiv preprint arXiv:2104.08894 , 2021. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "M. Refinetti, S. Goldt, F. Krzakala, and L. Zdeborova. Classifying high-dimensional gaussian mixtures: Where kernel methods fail and neural networks succeed. In M. Meila and T. Zhang, editors, Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pages 8936–8947. PMLR, 18–24 Jul 2021. URL https://proceedings.mlr.press/v139/refinetti21b.html .",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "G. M. Rotskoff and E. Vanden-Eijnden. Trainability and accuracy of neural networks: An interacting particle system approach. arXiv preprint arXiv:1805.00915 , 2018. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "T. Suzuki and A. Nitanda. Deep learning is adaptive to intrinsic dimensionality of model smoothness in anisotropic besov space. arXiv preprint arXiv:1910.12799 , 2019. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "T. Suzuki, A. Nitanda, and D. Wu. Uniform-in-time propagation of chaos for the mean-field gradient langevin dynamics. In The Eleventh International Conference on Learning Representations , 2022. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "T. Suzuki, D. Wu, and A. Nitanda. Mean-field langevin dynamics: Time-space discretization, stochastic gradient, and variance reduction. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023a. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "T. Suzuki, D. Wu, K. Oko, and A. Nitanda. Feature learning via mean-field langevin dynamics: classifying sparse parities and beyond. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023b. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "M. Telgarsky. Feature selection and low test error in shallow low-rotation ReLU networks. In The Eleventh International Conference on Learning Representations , 2023. URL https:// openreview.net/forum?id=swEskiem99 .",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "R. Vershynin. High-dimensional probability. University of California, Irvine , 2020. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "C. Wei, J. D. Lee, Q. Liu, and T. Ma. Regularization matters: Generalization and optimization of neural nets vs their induced kernel. In Advances in Neural Information Processing Systems , pages 9712–9724, 2019. ",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "",
+        "text_level": 1,
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A PROOFS OF PROPOSITIONS 3 AND 4 AND COROLLARY 1 ",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Proof of Proposition 3 .We follow the proof strategy from Suzuki et al. (2023b ). Remember that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{h_{x}(z)=\\bar{R}[\\operatorname{tanh}(z^{\\top}x_{1}+x_{2})+2\\operatorname{tanh}(x_{3})]/3.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Let $b_{i}=2i-k$ for $i=0,\\dots,k$ , let $\\zeta>0$ be the positive real such that $\\mathbb{E}_{u\\sim N(0,1)}[2\\operatorname{tanh}(\\zeta\\!+\\!u)]=1$ (note that, this also yields $\\mathbb{E}_{u\\sim N(0,1)}[2\\operatorname{tanh}(-\\zeta+u)]=-1$ by the symmetric property of tanh and the Gaussian distribution). Let ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\Sigma:=\\binom{I/(2\\lambda_{1})}{0}\\begin{array}{c}{0}\\\\ {1/(2\\lambda_{1})}\\\\ {0}\\end{array}\\begin{array}{r}{0}\\\\ {1}\\end{array}\\in\\mathbb{R}^{(d+1+1)\\times(d+1+1)},\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "and $\\rho>1$ be a constant which will be adjusted later on. Then, for $\\xi_{2j}:=[\\log(\\rho k)\\phi^{\\top},-\\log(\\rho k)(b_{j}-$ $1),\\zeta]^{\\top}\\in\\mathbb{R}^{\\bar{d}}$ and $\\xi_{2j+1}:=-[\\log(\\rho k)\\phi^{\\top},-\\log(\\rho k)(b_{j}+1),\\zeta]^{\\top}\\in{\\mathbb R}^{\\bar{d}}$ for $j=0,\\dots,k$ , we define ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{\\mu}_{2j}:={\\cal N}(\\xi_{2j},\\Sigma),\\;\\;\\;\\hat{\\mu}_{2j+1}:={\\cal N}(\\xi_{2j+1},\\Sigma).\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "By noticing that for $z\\in\\mathrm{supp}(P_{Z})$ there exists $\\widetilde{z}\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ }such that $z=A\\tilde{z}$ , we can see that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{x\\sim\\hat{\\mu}_{2j}}[h_{x}(z)]=\\bar{R}\\mathbb{E}_{u\\sim N(0,1/\\lambda_{1})}\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\tilde{\\phi},\\tilde{z}\\rangle-(b_{j}-1))+u]+1\\}/3\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "because we have ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{l}{{\\langle x_{1},z\\rangle+x_{2}=\\log(\\rho k)\\displaystyle(\\langle\\phi,z\\rangle-(b_{j}-1))+\\sum_{i=1}^{d}u_{i}z_{i}+u_{d+1}}}\\\\ {{\\qquad\\qquad=\\log(\\rho k)\\displaystyle(\\langle A^{-1}\\tilde{\\phi},A\\tilde{z}\\rangle-(b_{j}-1))+\\sum_{i=1}^{d}u_{i}z_{i}+u_{d+1},}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "for obeys the Gaussian distribution with mean 0 and variance for all $x\\sim N([\\phi^{\\top},(b_{j}-1)]^{\\top},I/(2\\lambda_{1}))$ $z\\in\\mathrm{supp}(P_{Z})$ ∈, where we used the assumption on where $u_{i}\\,\\sim\\,N(0,1/(2\\lambda_{1}))$ A $\\begin{array}{r}{\\frac{1}{2\\lambda_{1}}\\|z\\|^{2}+\\frac{1}{2\\lambda_{1}}=\\frac{1}{2\\lambda_{1}}\\left(1+\\|z\\|^{2}\\right)\\le\\frac{1}{\\lambda_{1}}}\\end{array}$ . In the same vein, we also have $\\begin{array}{r}{\\sum_{i=1}^{d}u_{i}z_{i}+u_{d+1}}\\end{array}$ \u0000\u0001",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{x\\sim\\hat{\\mu}_{2j+1}}[h_{x}(z)]=-\\bar{R}\\mathbb{E}_{u\\sim N(0,(1+\\|z\\|^{2})/2\\lambda_{1})}\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\tilde{\\phi},\\tilde{z}\\rangle-(b_{j}+1))+u]+1\\}/3.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "He of ze, define in the informative index set $|\\tilde{z}|_{0}:=|\\{i\\in I_{k}\\mid\\tilde{z}_{i}>0\\}|$ $I_{k}$ . For a fixed number for $\\tilde{z}\\in\\mathrm{supp}(P_{\\tilde{Z}})$ $j\\in\\{0,\\ldots,k\\}$ ∈{ which is the number of positive elements }, we let ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{f_{1}(z;u)=\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\tilde{\\phi},\\tilde{z}\\rangle-(b_{j}-1))+u]+1\\}/3,}\\\\ &{f_{2}(z;u)=\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\tilde{\\phi},\\tilde{z}\\rangle-(b_{j}+1))+u]+1\\}/3,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "then we can see that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{1}(z;0)=\\left\\{O(1/(\\rho k))\\begin{array}{l}{(|\\widetilde{z}|_{0}<j),}\\\\ {\\,\\,\\,(|\\widetilde{z}|_{0}\\geq j),}\\end{array}\\right.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "and ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{2}(z;0)=\\left\\{\\begin{array}{l l}{{O(1/(\\rho k))}}&{{(|\\tilde{z}|_{0}<j+1),}}\\\\ {{1-O(1/(\\rho k))}}&{{(|\\tilde{z}|_{0}\\geq j+1),}}\\end{array}\\right.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "because $\\begin{array}{r}{\\langle\\tilde{\\phi},\\tilde{z}\\rangle-b_{j}=\\sum_{j^{\\prime}=1}^{k}\\mathrm{sign}(\\tilde{z}_{j^{\\prime}})-b_{j}=2|\\tilde{z}|_{0}-k-b_{j}=2(|\\tilde{z}|_{0}-j)}\\end{array}$ . Hence, we have that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u):=f_{1}(z;u)-f_{2}(z;u)=\\left\\{\\!\\!\\begin{array}{l l}{\\Omega(1)}&{(|\\tilde{z}|_{0}=j),}\\\\ {O(1/(\\rho k))}&{(\\mathrm{otherwise}),}\\end{array}\\!\\!\\right.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "$|u|\\leq1/\\lambda_{1}$ and $f(z;u)>0$ ,for $|\\tilde{z}|_{0}=j$ . Then, since $\\begin{array}{r}{\\operatorname{tanh}(u)+1=\\frac{e^{u}-e^{-u}}{e^{u}+e^{-u}}+1=\\frac{2}{1+e^{-2u}}}\\end{array}$ , if $|\\tilde{z}|_{0}=j$ and ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u)\\geq\\Omega(1),\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "and if $|\\tilde{z}|_{0}\\neq j$ and $|u|\\le\\log(\\rho k)/2$ ,",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u)\\leq O(1/(\\rho k)).\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Therefore, when $|\\tilde{z}|_{0}=j$ ,",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{u\\sim N(0,(1+\\|z\\|^{2})/2\\lambda_{1})}[f(z;u)]\\ge\\int_{-1/\\lambda_{1}}^{1/\\lambda_{1}}f(z;u)g(u)\\mathrm{d}u>\\Omega(1).\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where $g$ is the density function of $N(0,(1+\\|z\\|^{2})/2\\lambda_{1})$ , and when $|\\tilde{z}|_{0}\\neq j$ ,",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{u\\sim N(0,(1+\\|z\\|^{2})/2\\lambda_{1})}[f(z;u)]\\le\\int_{-\\log(\\rho k)/2}^{\\log(\\rho k)/2}f(z;u)g(u)\\mathrm{d}u+\\int_{|u|\\ge\\log(\\rho k)/2}f(z;u)g(u)\\mathrm{d}z}\\\\ &{\\qquad\\qquad\\qquad\\qquad\\qquad\\le O\\bigl(1/(\\rho k)\\bigr)+O\\left(\\frac{\\exp\\bigl(-\\lambda_{1}\\log(\\rho k)^{2}/2\\bigr)}{\\log(\\rho k)}\\right)}\\\\ &{\\qquad\\qquad\\qquad\\qquad\\qquad=O(1/(\\rho k)),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where we used the upper-tail inequality of the Gaussian distribution in the second inequality. Hence, it holds that ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{f}_{i}(z):=\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i}}[h_{x}(z)]+\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i+1}}[h_{x}(z)]=\\Big\\{\\Omega(k)\\quad\\mathrm{(}|\\tilde{z}|_{0}=j),\\quad\\quad}\\\\ {O(1/\\rho)\\quad\\mathrm{(otherwise)},}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "because $\\bar{R}=k$ . Therefore, by taking $\\rho>1$ sufficiently large, we also have ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n{\\hat{f}}(z):={\\frac{1}{2(k+1)}}\\sum_{i=0}^{k}(-1)^{i}{\\hat{f}}_{i}(z)={\\biggl\\{\\Omega(1)}\\quad(|{\\tilde{z}}|_{0}{\\mathrm{~is~even}}),}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where the constant hidden in $\\Omega(\\cdot)$ is uniform over any $|\\tilde{z}|_{0}$ . Henc e exists $c_{2}^{\\prime}>0$ such that $Y\\hat{f}(Z)>c_{2}^{\\prime}$ almost surely. Now if we let $\\mu_{\\langle a\\rangle}(B):=\\mu(a B)$ for a $a\\in\\mathbb R$ ∈, a probability measure $\\mu$ and a measurable set $B$ , we can see that $\\hat{f}$ is represented as ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{f}(\\cdot)=\\mathbb{E}_{x\\sim\\mu^{*}}[h_{x}(\\cdot)],\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mu^{*}=\\frac{1}{2(k+1)}\\sum_{i=0}^{k}\\bigl(\\hat{\\mu}_{2i,\\langle(-1)^{i}\\rangle}+\\hat{\\mu}_{2i+1,\\langle(-1)^{i}\\rangle}\\bigr).\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Then, by letting $c_{2}=\\ell(0)-\\ell(c_{2}^{\\prime})$ , we have ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\nL(\\mu^{*})\\leq\\ell(0)-c_{2}.\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Next, we bound the KL divergence between $\\nu$ and $\\mu^{*}$ . The convexity of KL divergence yields that ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}{\\mathrm{KL}(\\nu,\\mu^{*})\\leq\\displaystyle\\frac{1}{2(k+1)}\\sum_{i=0}^{k}(\\mathrm{KL}(\\nu,\\hat{\\mu}_{2i})+\\mathrm{KL}(\\nu,\\hat{\\mu}_{2i+1}))}\\\\ &{\\qquad\\qquad\\leq\\lambda_{1}\\log(\\rho k)^{2}[\\|\\phi\\|^{2}+(\\displaystyle\\operatorname*{max}_{j}|b_{j}|+1)^{2}]+\\log(1/(2\\lambda_{1}))+\\lambda_{1}(1+\\zeta^{2})}\\\\ &{\\qquad=O\\left(\\log(k)^{2}\\left(\\|\\phi\\|^{2}+k^{2}\\right)\\right).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "This gives the assertion. ",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Next, we prove Proposition 4 .",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Proof of Proposition 4 .The proof of this statement resembles Proposition 4 of Suzuki et al. (2023b ). The key step in their proof is to show that the optimal solution satisfies ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n|f_{\\mu[\\lambda]}(z)|=|f_{\\mu[\\lambda]}(z^{\\prime})|\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "for any $z,z^{\\prime}\\in\\mathrm{supp}(P_{Z})$ . We prove that this still holds in our general setting. Let $T_{A}:\\mathbb{R}^{\\bar{d}}\\xrightarrow{}\\mathbb{R}$ be ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\nT_{A}x=(A x_{1},x_{2},x_{3}),\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where $\\boldsymbol{x}=\\left(x_{1},x_{2},x_{3}\\right)$ for $x_{1}\\in\\mathbb{R}^{d}$ ,$x_{2}\\in\\mathbb{R}$ and $x_{3}\\in\\mathbb{R}$ . Then, we can see that ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{\\mu}(z)=f_{T_{A\\#}\\mu}(\\tilde{z})\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "for $\\mu\\in\\mathcal P$ and $T_{A\\#}$ is the push-forward with respect to $T_{A}$ , and $z=A\\tilde{z}$ . Based on this coordinate transform, we can reduce the problem to the standard parity setting where the input obeys the $\\nu$ is transformed to niform distributio $\\nu_{A}:=T_{A\\#}\\nu$ $\\{\\pm1/\\sqrt{d}\\}^{d}$ }, which is again a normal distribution with mean . According to this coordinate transform, the prior distribution 0 and variance $A A^{\\top}/(2\\lambda_{1})$ . We also let $T_{j}$ be the map which flips the sign of the $i$ -th coordinate. Then, the key argument in the proof of Suzuki et al. (2023b ) is to show that ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathrm{KL}(\\nu_{A}||\\mu)=K(\\nu_{A}||T_{j\\#}\\mu)\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "for a measure $\\mu\\in\\mathcal P$ (which is supposed to be $T_{A\\#}\\hat{\\mu}$ for a population risk minimizer $\\hat{\\mu}$ ). This equality is true because the normal distribution is point symmetric. Indeed, we have ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathrm{KL}(\\nu_{A}||\\mu)=\\mathrm{KL}(T_{j\\#}\\nu_{A}||T_{j\\#}\\mu)=\\mathrm{KL}(\\nu_{A}||T_{j\\#}\\mu),\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "where the first equality is by the invariance of the KL divergence against any bijective coordinate transform and the second equality is by the point symmetry of the normal distribution. Then, following the same argument to Suzuki et al. (2023b ), we obtain the assertion. ",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "$\\operatorname{diag}\\left(s_{1}{\\sqrt{d}},s_{2}{\\sqrt{d}},\\ldots,s_{d}{\\sqrt{d}}\\right)$ Finally, Proposition \u00101 can be obtained as a corollary of Proposition \u0011. For this setting, we can easily see that 3 where we set ${\\cal A}\\ =$ ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\|\\phi\\|^{2}=\\sum_{j\\in I_{k}}s_{j}^{-2}.\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Combining with this evaluation and the fact that ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\nk=\\sum_{i\\in I_{k}}1=\\sum_{i\\in I_{k}}s_{i}s_{i}^{-1}\\leq\\sqrt{\\sum_{i\\in I_{k}}s_{i}^{2}}\\sqrt{\\sum_{i\\in I_{k}}s_{i}^{-2}}\\leq\\sqrt{\\sum_{i\\in I_{k}}s_{i}^{-2}}\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "we obtain the assertion. ",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "BESTIMATING THE INFORMATION MATRIX ",
+        "text_level": 1,
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "oss of gene ity, may take $I_{k}=\\{1,\\ldots,k\\}$ . Let $\\sigma(w^{\\top}z)=h_{x}(z)$ for $(x_{1},x_{2},x_{3})=$ $(w,b_{1},b_{2})$ for a fixed $b_{1}$ and $b_{2}$ . Then, ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sigma(w^{\\top}z)=\\sum_{\\ell=0}^{\\infty}\\frac{1}{\\ell!}\\underbrace{\\sigma^{(\\ell)}(0)(w^{\\top}z)^{\\ell}}_{=:c_{\\ell}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Note that the gradient of the loss with respect to $w_{j}$ can be written as ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\ng_{j}(w)=\\frac{1}{n}\\sum_{i=1}^{n}\\ell^{\\prime}(y_{i}f_{\\mu_{0}}(z_{i}))y_{i}z_{i,j}\\sigma^{\\prime}(w^{\\top}z_{i}).\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Suppose that $f_{\\mu_{0}}(z_{i})=0$ , then since $\\begin{array}{r}{Y=\\prod_{j\\in I_{k}}(s_{j}^{-1}Z_{j})}\\end{array}$ , its expectation can be expressed as ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\bar{g}_{j}(w):=\\mathbb{E}\\left[\\prod_{j^{\\prime}\\in I_{k}}(s_{j^{\\prime}}^{-1}Z_{j^{\\prime}})Z_{j}\\sigma^{\\prime}(w^{\\top}Z)\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "(1) If $j\\in I_{k}$ , then we have that ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\bar{g}_{j}(w):=s_{j}\\prod_{j^{\\prime}\\in I_{k}\\backslash j}s_{j^{\\prime}}^{-1}\\mathbb{E}\\left[\\prod_{j^{\\prime}\\in I_{k}\\backslash j}Z_{j^{\\prime}}\\sigma^{\\prime}(w^{\\top}Z)\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Then, by the Taylor expansion of $\\sigma$ , it holds that ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}{\\bar{g}_{j}(w)=\\bar{\\sigma}_{j}\\!\\!\\!\\!\\!\\prod_{\\ell=1}^{n}\\frac{s_{j}^{-1}}{\\!\\!\\!\\!\\!\\gamma(k_{0})}\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!}&{{}}\\\\ {+\\frac{\\kappa_{j}}{2}\\frac{s_{\\ell}^{-1}}{\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!}}&{\\Bigg|\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "The higher order term $(a)$ in the above expression can be evaluated as ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\displaystyle\\sum_{i=1}^{n}\\left\\{\\prod_{j=1}^{n}\\mathcal{Z}_{j,\\ell-1}\\left(\\pi_{j}^{i}\\right)\\right\\}}\\\\ &{=\\displaystyle\\sum_{j=1}^{n}\\left\\{\\prod_{s=1}^{n}\\mathcal{Z}_{j,\\ell-1}\\left(\\prod_{s=1}^{n}\\sum_{u=k+1\\atop h\\to1}^{n}\\mathrm{e}_{\\beta,u,j}\\sum_{\\ell=1,h\\atop h\\to1}^{n}\\right)_{\\beta,u=1\\atop h\\to1}^{n}\\left(\\sum_{\\ell\\neq1,h\\atop h\\to1}^{n}\\mathrm{e}_{\\beta,u,j}\\sum_{\\ell=1,h\\atop h\\to1}^{n}\\right)_{\\beta,u=1\\atop h\\to1}^{n}\\right.}\\\\ &{\\quad\\cdot\\left(\\sum_{\\ell\\neq1,h\\atop h\\to1}^{n}\\sum_{u=k+1\\atop h\\to1}^{n}\\nu_{\\beta,u}\\sum_{\\ell=1}^{n}\\left(\\nu_{\\beta,t-1}\\sum_{u=k+1\\atop h\\to1}^{n}\\nu_{\\beta,t-1}^{\\beta}\\right)^{2}\\right)^{n-m}n_{\\beta,\\eta}Z_{h}}\\\\ &{\\quad-\\displaystyle\\sum_{i=1}^{n}\\sum_{\\ell\\neq1,h\\atop h\\to1}^{n}\\left(\\prod_{s=1}^{n}\\sum_{u=k+1\\atop h\\to1}^{n}\\nu_{\\beta,t-1}^{\\beta}\\right)^{n-m}n_{\\beta,\\eta}Z_{h}\\right\\}}\\\\ &{=\\displaystyle\\sum_{j=1}^{n}\\left\\{\\prod_{s=1}^{n}\\sum_{\\ell=1}^{n}\\sum_{u=k+1\\atop h\\to1}^{n}\\Big[\\sum_{\\ell=1}^{n}\\sum_{u=k+1\\atop h\\to1}^{n}\\sum_{u=k+1\\atop1}^{n}\\sum_{\\ell=1}^{n}\\Big(\\sum_{\\ell=1}^{n}\\sum_{u=k+1\\atop1}^{n}\\Big(\\sum_{\\ell=1}^{n}\\nu_{\\beta,t}^{\\alpha}Z_{\\ell}\\Big)^{n}\\Big)^{n}\\right.\\right.}\\\\ &{\\quad\\cdot\\left.\\left(\\sum_{\\ell=1}^{n}\\sum_{u=k+1\\atop1}^{n}\\nu_{\\beta,t}^{\\alpha}Z_{\\ell}\\right)^{n-m+1}\\right.+\\left.\\left(\\sum_{\\ell=1}^{n}\\sum_{\\ell=1}^{n}\\nu_{\\beta,t} \n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Then, applying Hölder’s inequality, we can bound the right hand side as ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sum_{\\substack{=k}}^{\\infty}\\prod_{\\substack{j^{\\prime}\\in I_{k}\\backslash j}}(s_{j^{\\prime}}^{2}w_{j^{\\prime}})\\cdot\\frac{c_{\\ell+1}}{\\ell!}\\cdot\\sum_{\\substack{\\{j_{1},\\ldots,j_{k-1}\\}=I_{k}\\backslash j\\,0\\le\\ell_{1}<\\ell_{2}<\\cdots<\\ell_{k-1}<\\ell}}\\mathbb{E}\\left[\\left|\\sum_{j^{\\prime}\\in(I_{k}\\backslash j)^{\\mathrm{c}}}w_{j^{\\prime}}Z_{j^{\\prime}}\\right|^{\\ell-k+1}\\right]^{\\frac{\\ell_{1}}{\\ell-k+1}}\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\cdot\\mathbb{E}\\left[\\left|\\sum_{j^{\\prime}\\in(I_{k}\\backslash\\{j,j_{1}\\})^{c}}w_{j^{\\prime}}Z_{j^{\\prime}}\\right|^{\\ell-k+1}\\right]^{\\frac{\\ell_{2}-\\ell_{1}+1}{\\ell-k+1}}\\cdot\\cdot\\cdot\\mathbb{E}\\left[\\left|\\sum_{j^{\\prime}\\in(I_{k}\\backslash\\{j,j_{1},\\dots,j_{k-2}\\})^{c}}w_{j^{\\prime}}Z_{j^{\\prime}}\\right|^{\\ell-k+1}\\right]^{\\frac{\\ell_{k-1}-\\ell_{1}}{\\ell-k}}}\\\\ {\\cdot\\mathbb{E}\\left[\\left|w^{\\top}Z\\right|^{\\ell-k+1}\\right]^{\\frac{\\ell-\\ell_{k-1}+1}{\\ell-k+1}}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Now, we use the moment bound of sub-Gaussian random variables to bound each term $\\mathbb{E}[\\big|\\sum_{j^{\\prime}\\in(I_{k}\\backslash\\{j,j_{1},\\ldots,j_{a}\\})^{c}}w_{j^{\\prime}}Z_{j^{\\prime}}|^{\\ell-k+1}]^{\\frac{\\ell_{a}-\\ell_{a-1}+1}{\\ell-k+1}}$ . Indeed, we can see that, for any index set $J\\subset I$ ,$w_{J}^{\\top}Z_{J}$ i ∈sub-Gaussian ran \\{ }om varia $\\|w_{J}\\odot s_{J}\\|^{3}$ where a sub-Gaussian ra dom variableXwith a parameterusatisfied $\\mathbb{E}[|X|^{\\ell}]\\leq(c u)^{\\ell}\\ell^{\\ell/2}$ ||≤( $\\mathbb{V}\\!\\left[\\underline{{\\lor}}\\right]\\geq1\\!\\!\\!\\phantom{\\sim}$ ∀≥with a $c$ Proposition 2.5.2 of Vershynin (2020 ), for example). Hence, by noticing that ∥$\\|w_{J}\\odot s_{J}\\|^{2}\\leq\\|w\\odot s\\|^{2}$ ⊙∥≤∥ ⊙∥and $\\begin{array}{r}{\\ell_{1}+\\sum_{b=2}^{k-1}(\\ell_{b}-\\ell_{b-1}+1)+\\ell-\\ell_{k-1}+1=\\ell-k+1}\\end{array}$ −−−, the right hand side can be bounded by ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\backslash j}s_{j^{\\prime}}^{2}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\backslash j}w_{j^{\\prime}}\\cdot\\displaystyle\\sum_{\\ell=k}^{\\infty}\\frac{c_{\\ell+1}}{\\ell!}(k-1)!\\frac{\\ell!}{(\\ell-k+1)!(k-1)!}(c||w\\odot s||)^{\\ell-k+1}(\\ell-k+1)^{(\\ell-k+1)/2}}\\\\ &{=\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\backslash j}s_{j^{\\prime}}^{2}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\backslash j}w_{j^{\\prime}}\\cdot\\displaystyle\\sum_{\\ell=k}^{\\infty}c_{\\ell+1}(c||w\\odot s||)^{\\ell-k+1}\\frac{(\\ell-k+1)^{(\\ell-k+1)/2}}{(\\ell-k+1)!}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Then, by the Stirling’s formula, the right hand side can be bounded by ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\setminus j}s_{j^{\\prime}}^{2}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\setminus j}|w_{j^{\\prime}}|\\cdot\\sum_{\\ell=k}^{\\infty}c_{\\ell+1}||w\\odot s||^{\\ell-k+1}\\frac{(\\ell-k+1)^{(\\ell-k+1)/2}}{\\sqrt{2\\pi}(\\ell-k+1)^{\\ell-k+1+1/2}e^{-(\\ell-k+1)}}}\\\\ &{\\displaystyle=\\prod_{j^{\\prime}\\in I_{k}\\setminus j}s_{j^{\\prime}}^{2}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\setminus j}|w_{j^{\\prime}}|\\cdot\\sum_{\\ell=k}^{\\infty}c_{\\ell+1}||w\\odot s||^{\\ell-k+1}\\frac{1}{\\sqrt{2\\pi}}\\left(\\frac{e}{(\\ell-k+1)^{1/2}}\\right)^{\\ell-k+1}\\frac{1}{(\\ell-k+1)^{1/2}}}\\\\ &{\\displaystyle\\leq\\frac{c_{k}}{2}\\prod_{j^{\\prime}\\in I_{k}\\setminus j}s_{j^{\\prime}}^{2}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\setminus j}|w_{j^{\\prime}}|,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "$\\lVert w\\ \\odot\\ s\\rVert$ ficiently small such that $\\begin{array}{r}{\\sum_{\\ell=k}^{\\infty}c_{\\ell+1}(c||w\\odot}\\end{array}$ $\\begin{array}{r}{s\\|)^{\\ell-k+1}\\frac{1}{\\sqrt{2\\pi}}\\left(\\frac{e}{(\\ell-k+1)^{1/2}}\\right)^{\\ell-k+1}\\frac{1}{(\\ell-k+1)^{1/2}}\\leq\\frac{c_{k}}{2}.}\\end{array}$ \u0010\u0011. Therefore, we can see that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{l}{{\\displaystyle\\bar{g}_{j}(w)=c_{k}\\cdot\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\backslash j}w_{j^{\\prime}}+(\\mathrm{higher\\;order\\;term}),}}\\\\ {{\\displaystyle|\\bar{g}_{j}(w)|\\geq\\frac{c_{k}}{2}\\cdot\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\backslash j}|w_{j^{\\prime}}|,}}\\\\ {{\\displaystyle|\\bar{g}_{j}(w)|\\leq\\frac{3}{2}c_{k}\\cdot\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}\\cdot\\prod_{j^{\\prime}\\in I_{k}\\backslash j}|w_{j^{\\prime}}|.}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "(2) In the same vein, we also have that, for $j\\not\\in I_{k}$ , it holds that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{g}_{j}(w)=c_{k+2}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\cup j}s_{j^{\\prime}}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\cup j}w_{j^{\\prime}}+(\\mathrm{higher\\;order\\;term}),}\\\\ &{|\\bar{g}_{j}(w)|\\leq2c_{k+2}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\cup j}s_{j^{\\prime}}\\cdot\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\cup j}|w_{j^{\\prime}}|.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Next, we show the concentration of the empirical gradient $g_{j}(w)$ around its expectation. Observe that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\operatorname*{sup}_{Y,Z}|\\ell^{\\prime}(Y f_{\\mu_{0}}(Z))Y Z_{j}\\sigma^{\\prime}(w^{\\top}Z)|\\leq\\bar{R}s_{j},\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathrm{Var}_{Y,Z}[\\ell^{\\prime}(Y f_{\\mu_{0}}(Z))Y Z_{j}\\sigma^{\\prime}(w^{\\top}Z)]\\leq\\bar{R}^{2}s_{j}^{2}.\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Therefore, by Bernstein’s inequality, we obtain that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP\\left(|g_{j}(w)-\\bar{g}_{j}(w)|\\geq\\frac{4\\bar{R}s_{j}}{\\sqrt{n}}\\log(2/\\delta)\\right)\\leq\\delta\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "for any $\\delta\\in(0,1)$ . Hence, if we let $n$ ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\nn\\geq\\frac{16k\\bar{R}^{2}\\log(2N/\\delta)^{2}d}{\\left(C_{0}c_{k}\\cdot\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}\\right)^{2}},\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "for a sufficiently small constant $C_{0}$ , then we have that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n|g_{j}(w_{l})-\\bar{g}_{j}(w_{l})|\\le C_{0}c_{k}\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}\\cdot s_{j}/\\sqrt{k d},\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "uniformly over $l=1,\\ldots,N$ with probability $\\delta$ .",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array}{r}{\\sum_{\\ell=k}^{\\infty}\\frac{c_{\\ell+1}}{(\\ell-k+1)!}\\mathbb{E}_{Z}\\left[(w^{\\top}Z)^{\\ell-k+1}\\right]=\\frac12\\|w\\odot s\\|^{2}+\\sum_{\\ell=0}^{\\infty^{\\circ}}\\frac{c_{k+4+2\\ell}}{(4+2\\ell)!}\\mathbb{E}_{Z}\\left[(w^{\\top}Z)^{4+2\\ell}\\right]}\\end{array}$ For that purpose, we evaluate the expectations of ''P$g_{j_{1}}(w)g_{j_{2}}(w)$ carefully. ''Let . We evaluate $H(w)\\ \\ =$ for each condition on −$j_{1}$ and $j_{2}$ .",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "(a) If $j_{1}=j_{2}\\in I_{k}$ , then it holds that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{W}[\\bar{g}_{j_{1}}(W)\\bar{g}_{j_{1}}(W)]=c_{k}^{2}\\displaystyle\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\mathbb{E}_{W}\\left[\\displaystyle\\prod_{j^{\\prime}\\in I_{k}\\setminus j_{1}}W_{j^{\\prime}}^{2}(1+H(W))^{2}\\right]}\\\\ &{\\qquad\\qquad\\qquad\\qquad=\\Omega\\left(\\displaystyle\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\right).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "(b) If $j_{1}\\neq j_{2}$ and $j_{1},j_{2}\\in I_{k}$ , then it holds that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathbb{E}_{W}[\\bar{g}_{j_{1}}(W)\\bar{g}_{j_{2}}(W)]=c_{k}^{2}\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\mathbb{E}\\left[\\prod_{j^{\\prime}\\in I_{k}\\backslash\\{j_{1},j_{2}\\}}W_{j^{\\prime}}^{2}\\cdot W_{j_{1}}W_{j_{2}}(1+H(W))^{2}\\right]=0,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "where we used that the distribution of $W$ is symmetric and $H(W)$ satisfies $H(W)=H(-W)$ .(c) If $j_{1}\\neq j_{2}$ and $j_{1}\\in I_{k}$ and $j_{2}\\not\\in I_{k}$ , then ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{W}[\\bar{g}_{j_{1}}(W)\\bar{g}_{j_{2}}(W)]=c_{k}c_{k+2}\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}s_{j_{2}}\\mathbb{E}\\left[\\prod_{j^{\\prime}\\in I_{k}\\backslash j_{1}}W_{j^{\\prime}}^{2}\\cdot W_{j_{2}}(1+H(W))^{2}\\right]=0.\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "(d) If $j_{1}\\not\\in I_{k}$ and $j_{2}\\not\\in I_{k}$ , then ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{W}[\\bar{g}_{j_{1}}(W)\\bar{g}_{j_{2}}(W)]=c_{k+2}^{2}\\displaystyle\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}s_{j_{1}}s_{j_{2}}\\mathbb{E}\\left[\\prod_{j^{\\prime}\\in I_{k}}W_{j^{\\prime}}^{2}\\cdot W_{j_{1}}W_{j_{2}}(1+H(W))^{2}\\right]}\\\\ &{\\qquad\\qquad\\qquad\\qquad=\\left\\{\\mathcal{O}(\\prod_{j^{\\prime}\\in I_{k}\\cup j_{1}}s_{j^{\\prime}}^{2})\\!\\!\\!\\!}&{(j_{1}\\neq j_{2}),}\\\\ &{\\qquad\\qquad\\qquad\\qquad\\qquad\\mathcal{O}(\\prod_{j^{\\prime}\\in I_{k}\\cup j_{1}}s_{j^{\\prime}}^{2})\\!\\!\\!\\!}&{(j_{1}=j_{2}).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Summarizing these evaluations, we can see that $\\bar{G}=(\\bar{G}_{j_{1},j_{2}})_{j_{1}=1,j_{2}=1}^{d,d}\\in\\mathbb{R}^{d\\times d}$ defined by ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\bar{G}_{j_{1},j_{2}}=\\mathbb{E}_{W}[\\bar{g}_{j_{1}}(W)\\bar{g}_{j_{2}}(W)]\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "is a diagonal matrix where $\\bar{G}_{j_{1},j_{1}}$ for $j_{1}\\in I_{k}$ has larger values than that for $j_{1}\\not\\in I_{k}$ . We define its empirical average version $G=(G_{j_{1},j_{2}})_{j_{1}=1,j_{2}=1}^{d,d}\\in\\mathbb{R}^{d\\times d}$ as ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\nG_{j_{1},j_{2}}=\\frac{1}{N}\\sum_{l=1}^{N}g_{j_{1}}(w_{l})g_{j_{2}}(w_{l}).\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Now, we show the concentration of $G$ around its population version $\\bar{G}$ . Note that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{c l}{{\\displaystyle\\frac{1}{N}\\sum_{l=1}^{N}g_{j_{1}}(w_{l})g_{j_{2}}(w_{l})=\\frac{1}{N}\\sum_{l=1}^{N}(g_{j_{1}}(w_{l})-\\bar{g}_{j_{1}}(w_{l})+\\bar{g}_{j_{1}}(w_{l}))(g_{j_{2}}(w_{l})-\\bar{g}_{j_{2}}(w_{l})+\\bar{g}_{j_{2}}(w_{l}))}}\\\\ {{\\displaystyle}}&{{\\displaystyle=\\frac{1}{N}\\sum_{l=1}^{N}(g_{j_{1}}(w_{l})-\\bar{g}_{j_{1}}(w_{l}))(g_{j_{2}}(w_{l})-\\bar{g}_{j_{2}}(w_{l}))}}\\\\ {{\\displaystyle}}&{{\\displaystyle\\;\\;+\\frac{1}{N}\\sum_{l=1}^{N}g_{j_{1}}(w_{l})-\\bar{g}_{j_{1}}(w_{l}))\\bar{g}_{j_{2}}(w_{l})}}\\\\ {{\\displaystyle}}&{{\\displaystyle\\;\\;+\\frac{1}{N}\\sum_{l=1}^{N}(g_{j_{2}}(w_{l})-\\bar{g}_{j_{2}}(w_{l}))\\bar{g}_{j_{1}}(w_{l})}}\\\\ {{\\displaystyle}}&{{\\displaystyle\\;\\;+\\frac{1}{N}\\sum_{l=1}^{N}\\bar{g}_{j_{1}}(w_{l})\\bar{g}_{j_{2}}(w_{l}).}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Therefore, if we let $\\begin{array}{r}{\\Delta G_{j_{1},j_{2}}=G_{j_{1},j_{2}}-\\bar{G}_{j_{1},j_{2}},\\hat{G}_{j_{1},j_{2}}=\\frac{1}{N}\\sum_{l=1}^{N}\\bar{g}_{j_{1}}(w_{l})\\bar{g}_{j_{2}}(w_{l})}\\end{array}$ and $\\dot{G}_{j_{1},j_{2}}:=$ $\\begin{array}{r}{\\frac{1}{N}\\sum_{l=1}^{N}(g_{j_{1}}(w_{l})-\\bar{g}_{j_{1}}(w_{l}))(g_{j_{2}}(w_{l})-\\bar{g}_{j_{2}}(w_{l}))}\\end{array}$ P, then for any $u\\in\\mathbb{R}^{d}$ ∈, it holds that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{c}{{u^{\\top}\\Delta G u|\\leq\\!2u^{\\top}\\left(\\displaystyle\\frac1N\\displaystyle\\sum_{l=1}^{N}(g(w_{l})-\\bar{g}(w_{l}))(g(w_{l})-\\bar{g}(w_{l}))^{\\top}\\right)u+2u^{\\top}\\left(\\displaystyle\\frac1N\\displaystyle\\sum_{l=1}^{N}\\bar{g}(w_{l})\\bar{g}(w_{l})^{\\top}\\right)u}}\\\\ {{\\leq2u^{\\top}\\dot{G}u+2u^{\\top}(\\hat{G}-\\bar{G})u+2u^{\\top}\\bar{G}u.}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Here, the term $\\hat{G}-\\bar{G}$ can be bounded by the matrix Bernstein’s inequality as ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP\\left[\\|\\hat{G}-\\bar{G}\\|_{\\mathrm{op}}\\ge K\\left(\\sqrt{\\frac{Q^{2}(t+\\log(d))}{N}}+\\frac{(t+\\log(d))Q}{N}\\right)\\right]\\le\\exp(-t),\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "where $K$ is $\\begin{array}{r}{Q=d\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}}\\end{array}$ because $\\lVert\\bar{g}(w_{l})\\bar{g}^{\\top}(w_{l})\\rVert_{\\mathrm{op}}\\leq O(Q)$ . Therefore, taking $N=\\Omega(d^{2}k^{2}\\log(d/\\delta)/(C_{0}\\operatorname*{max}_{j^{\\prime}\\in I_{k}}\\bar{s}_{j^{\\prime}}^{4}))$ for sufficiently small $C_{0}$ yields that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\|\\hat{G}-\\bar{G}\\|_{\\mathrm{op}}=\\mathcal{O}\\left(C_{0}\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\cdot\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}/k\\right),\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\delta$ . In the same manner, we also have that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\nG\\succeq\\frac{1}{2}\\bar{G}+(\\hat{G}-\\bar{G})-\\dot{G}.\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "In the following, we let $\\begin{array}{r}{Q_{1}:=\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}}\\end{array}$ , and $\\begin{array}{r}{Q_{2}:=\\prod_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}\\cdot\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}}\\end{array}$ .∈",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Then, by modifying the objective as ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\nL(\\mu)+\\lambda_{1}\\mathbb{E}_{\\mu}[\\|X\\|_{(G+\\hat{\\lambda}_{0}I)^{-1}}^{2}]\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "$B=\\operatorname{diag}\\left(s_{1}{\\sqrt{d}},\\ldots,s_{d}{\\sqrt{d}}\\right)$ $L(\\mu)+\\lambda_{1}\\mathbb{E}_{\\mu}[\\|X\\|^{2}]$ with a regularization parameter \u0010where the input is transformed as \u0011and a constant $\\hat{\\lambda}_{0}~=~Q_{2}$ $c_{A}=\\mathcal O((k Q_{1}\\operatorname*{max}_{j^{\\prime}}s_{j^{\\prime}}^{2})^{-1/2})$ .This is equivalent to the alternative objective $Z\\gets A\\tilde{Z}$ where $A=c_{A}\\sqrt{G+\\hat{\\lambda}_{0}I}\\dot{B}$ such that p$\\|A\\tilde{Z}\\|\\leq1$ with .Indeed, we can take such $c_{A}$ because ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\left|\\sqrt{G+\\hat{\\lambda}_{0}I}B\\tilde{Z}\\right|\\right|^{2}\\leq\\tilde{Z}^{\\top}B\\left(2\\dot{G}+(\\hat{G}-\\bar{G})+3\\bar{G}\\right)B\\tilde{Z}}\\\\ &{\\qquad\\qquad\\qquad\\lesssim\\left(\\displaystyle\\sum_{j_{1},j_{2}=1}^{d}s_{j_{1}}^{2}s_{j_{2}}^{2}\\right)Q_{1}/(k d)+Q_{2}(d\\operatorname*{max}_{j^{\\prime}}s_{j^{\\prime}}^{2})+\\operatorname*{max}_{j^{\\prime}}s_{j^{\\prime}}^{2}(k Q_{1}+(d-k)Q_{2})}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\lesssim k Q_{1}\\operatorname*{max}_{j^{\\prime}}s_{j^{\\prime}}^{2},\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "where we used the as $\\textstyle\\sum_{j=1}^{d}s_{j}^{2}=1$ and the fact that $d Q_{2}=d Q_{1}\\cdot\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}\\lesssim Q_{1}$ due to the assumption $d\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}=O(1)$ . Then, we can see that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\|A^{-1}\\tilde{\\phi}\\|^{2}=c_{A}^{-2}\\tilde{\\phi}^{\\top}B^{-1}(G+\\hat{\\lambda}_{0}I)^{-1}B^{-1}\\tilde{\\phi}=c_{A}^{-2}\\zeta_{s}^{\\top}(G+\\hat{\\lambda}_{0}I)^{-1}\\zeta_{s},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "for $\\zeta_{s}=(s_{1}^{-1},\\ldots,s_{k}^{-1},0,\\ldots,0)^{\\top}$ . Now, let ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\nG+\\hat{\\lambda}_{0}={\\binom{G_{[1,1]}}{G_{[2,1]}}}\\ G_{[2,2]}\\nonumber\\,\\nonumber\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Then, we can see that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(G+\\hat{\\lambda}_{0}I)^{-1}=\\left(\\!\\!\\begin{array}{c c}{{(G_{[1,1]}-G_{[1,2]}G_{[2,2]}^{-1}G_{[2,1]})^{-1}}}&{{\\ast}}\\\\ {{\\ast}}&{{\\ast}}\\end{array}\\!\\!\\right).\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "We know that $\\|G_{[2,2]}^{-1}\\|_{\\mathrm{op}}\\leq\\|(\\hat{\\lambda}_{0}I)^{-1}\\|_{\\mathrm{op}}=Q_{2}^{-1}$ and ∥$\\|G_{[1,2]}\\|_{\\mathrm{op}}\\lesssim C_{0}\\sqrt{k(d-k)Q_{1}Q_{2}/(k d)}$ ∥by the same argument as Eq. ( 16 ) and the assumption $d\\operatorname*{max}_{j^{\\prime}\\notin I_{k}}s_{j^{\\prime}}^{2}=O(1)$ . Hence, we can see that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\nG_{[1,1]}-G_{[1,2]}G_{[2,2]}^{-1}G_{[2,1]}\\asymp G_{1}I-\\mathcal{O}(C_{0}^{2}(k(d-k)Q_{1}Q_{2}/(k d))/Q_{2})I\\asymp[Q_{1}-\\mathcal{O}(C_{0}^{2}Q_{1})]I,\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "by Eq. ( 17 ). Therefore, by taking $C_{0}$ sufficiently small, we have that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(G_{[1,1]}-G_{[1,2]}G_{[2,2]}^{-1}G_{[2,1]})^{-1}\\precsim Q_{1}^{-1}I.\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Therefore, we finally arrive at ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\|A^{-1}\\tilde{\\phi}\\|^{2}\\leq c_{A}^{-2}\\|\\zeta_{s}\\|^{2}\\|(G_{[1,1]}-G_{[1,2]}G_{[2,2]}^{-1}G_{[2,1]})^{-1}\\|_{\\mathrm{op}}}\\\\ &{\\qquad\\qquad\\lesssim k Q_{1}\\left(\\underset{j^{\\prime}}{\\operatorname*{max}}s_{j^{\\prime}}^{2}\\right)\\cdot k\\left(\\underset{j^{\\prime}\\in I_{k}}{\\operatorname*{min}}s_{j^{\\prime}}^{2}\\right)^{-1}\\cdot Q_{1}^{-1}=k^{2}\\frac{\\operatorname*{max}_{j^{\\prime}\\in[d]}s_{j^{\\prime}}^{2}}{\\operatorname*{min}_{j^{\\prime}\\in I_{k}}s_{j^{\\prime}}^{2}}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "CKERNEL LOWER BOUND ",
+        "text_level": 1,
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "In this section, we derive the kernel lower bound for the $k$ -parity classification problem (Example 2 )in the spiked covariance setting. Our proof is divided into two steps. First, we translate the event when prediction fails into when the value of $|f_{\\beta}(z)|$ is away from zero. of for 2 -parity (Wei et al. ,2019 ) and an additional observation that $K(z,z^{i})$ have d$d^{-(1-\\alpha)k^{*}-(k-k^{*})}$ correlation to $y$ , to get the tighter bound for general higher order parities than that in Wei et al. (2019 ). Then, we show that the probability of that event is evaluated by the the smallest eigenvalue of some kernel matrix defined in Lemma 3 . Finally, we apply the lower bound of the smallest eigenvalue using the technique of Misiakiewicz (2022 ). ",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Note that, we do not need to prove Theorem for such $\\alpha$ . Thus in the following we assume 3 $\\begin{array}{r}{1-\\frac{1}{k^{*}}<\\alpha\\leq1}\\end{array}$ for $\\begin{array}{r}{1-\\frac{1}{k^{*}}<\\alpha\\leq1}\\end{array}$ −≤, hence , because $1-\\alpha>0$ $\\lfloor(1-\\alpha)k^{*}\\rfloor=0$ .holds Lemma 1. For $n\\leq d^{(1-\\alpha)k^{*}+(k-k^{*})}$ , with probability $1-\\exp(-\\Omega(d))$ over the random draws of the training sample, we have ",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathbb{P}_{z\\sim P_{Z}}\\left[f_{\\beta}(z)y<0\\right]\\gtrsim\\mathbb{P}_{z\\sim P_{Z}}\\left[|f_{\\beta}(z)|\\geq\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|\\right]-1/d,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "where $c$ is a constant depending on $k$ and $\\{\\gamma_{l}\\}_{l}$ .",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Proof. all choices of high probability). Then, consider the average of Consi $z_{1:k}$ and ando |$\\begin{array}{r}{|f_{\\beta}(z)|\\gtrsim\\frac{\\dot{c}}{d^{(1-\\alpha)k}}\\sum_{i=1}^{n}|\\beta_{i}|}\\end{array}$ $z_{k+1:d}$ P$K(z,z^{i})y$ fix in the over the choices of e$z_{1:k}$ owing. Suppose for the sake $z_{1:k}$ $f_{\\beta}(z)y(z)\\geq0$ as follows: ntradiction (with for ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z_{1:k}}\\left[K(z,z^{i})y(z)\\right|z_{k+1:d}\\right]=\\mathbb{E}_{z_{1:k}}\\left[\\sum_{l=0}^{\\infty}\\alpha_{l}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}y(z)\\right|z_{k+1:d}\\right]\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n=\\sum_{l=k}^{\\infty}\\gamma_{l}\\mathbb{E}_{z_{1:k}}\\left[\\left({\\frac{z^{\\top}z^{i}}{d}}\\right)^{l}\\prod_{j^{\\prime}=1}^{k}z_{j^{\\prime}}\\right]z_{k+1:d}\\right]\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Let us evaluate $\\begin{array}{r}{\\mathbb{E}_{z_{1:k}}\\big[\\big(\\frac{z^{\\top}z^{i}}{d}\\big)^{l}\\prod_{j^{\\prime}=1}^{k}z_{j^{\\prime}}\\big|z_{k+1:d}\\big]}\\end{array}$ . For $\\begin{array}{r}{k\\;\\leq\\;l\\;\\leq\\;\\lceil\\frac{2\\left((1-\\alpha)k^{*}+\\left(k-k^{*}\\right)\\right)}{1-\\alpha}\\rceil}\\end{array}$ , we expand $\\begin{array}{r}{\\big(\\frac{z^{\\top}z^{i}}{d}\\big)^{l}=(\\sum_{i=j}^{d}\\frac{z_{j}z_{j}^{i}}{d})^{l}}\\end{array}$ Pto obtain −",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z_{1:k}}\\left[\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}\\prod_{j^{\\prime}=1}^{k}z_{j^{\\prime}}\\Bigg|\\;z_{k+1:d}\\right]\\le\\sum_{l^{\\prime}=k}^{l}l C_{l^{\\prime}}k^{l^{\\prime}}(d-k)^{l-l^{\\prime}}\\;\\left(\\frac{d^{\\alpha}}{d}\\right)^{k^{*}}\\left(\\frac{1}{d}\\right)^{k-k^{*}}\\left(\\frac{1}{d}\\right)^{l-l^{\\prime}}\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\lesssim d^{-(1-\\alpha)k^{*}-(k-k^{*})}.\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "For $\\begin{array}{r}{l~\\geq~\\lceil\\frac{2\\left((1-\\alpha)k^{*}+(k-k^{*})\\right)}{1-\\alpha}\\rceil+1}\\end{array}$ , we have |$\\begin{array}{r}{|\\frac{z^{\\top}z^{i}}{d}|~\\lesssim~d^{-(1-\\alpha)/2}\\sqrt{\\log d}}\\end{array}$ with probability $1\\,-$ $1/d^{(1-\\alpha)k+(k-k^{*})+1}$ −over the choice of $z_{k+1:d}$ , and therefore $\\begin{array}{r}{\\sum_{l=2k+1}^{\\infty}\\mathbb{E}_{z_{1:k}}\\big[|{\\frac{z^{\\top}z^{i}}{d}}|^{l}|z_{k+1:d}\\big]\\ \\lesssim}\\end{array}$ $d^{-(1-\\alpha)k^{*}-(k-k^{*})}$ . By using them for ( 18 ), we have ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z_{1:k}}\\left[K(z,z^{i})y(z)\\big|\\,z_{k+1:d}\\right]=\\mathbb{E}_{z_{1:k}}\\left[\\sum_{l=0}^{\\infty}\\alpha_{l}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}y(z)\\right|z_{k+1:d}\\right]\\lesssim d^{-(1-\\alpha)k^{*}-(k-k^{*})}\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "for randomly drawn $z_{k+1:d}$ , with probability more than $1-1/d^{(1-\\alpha)k^{*}+(k-k^{*})+1}$ . Therefore, ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{l}{\\displaystyle\\mathbb{E}_{z_{1:k}}\\left[f_{\\beta}(z)y(z)|\\,z_{k+1:d}\\right]=\\mathbb{E}_{z_{1:k}}\\left[\\sum_{i}\\beta_{i}K(z,z^{i})y(z)\\right|z_{k+1:d}\\right]}\\\\ {\\displaystyle\\lesssim\\frac{1}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "with probability more than $1-1/d$ .",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "On the other hand, if $f_{\\beta}(z)y(z)\\geq0$ for all $z_{1:k}$ and |$\\begin{array}{r}{|f_{\\beta}(z)|\\gtrsim\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|}\\end{array}$ P|for some $z_{1:k}$ , we have ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z_{1:k}}\\left[f_{\\beta}(z)y(z)\\right\\vert z_{k+1:d}\\right]=\\frac{1}{2^{k}}\\sum_{z_{1:k}}f_{\\beta}(z)y(z)\\geq\\frac{1}{2^{k}}\\cdot\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|.\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "By comparing choice of $z_{k+1:d}$ (by taking 20 )and (2 csufficiently large. Therefore, if ), we have the contradiction for more than $\\begin{array}{r}{|f_{\\beta}(z)|\\gtrsim\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|}\\end{array}$ $1-1/d$ probability of the Pfor some $z_{1:k}$ , there exists some $z_{1:k}$ that yields $f_{\\beta}(z)y<0$ , for $z_{k+1:d}$ that is drawn with probability more than $1-1/d$ , which yields the conclusion. ",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "very high order terms, make the following approximation. Now we evaluate the probability $\\begin{array}{r}{\\mathbb{P}_{z\\sim P_{Z}}[|f_{\\beta}(z)|\\ge\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|]}\\end{array}$ ∼P. Since $f_{\\beta}(z)$ can have ",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Lemma 2. Let us define $g_{1}\\colon[-1,1]\\to\\ensuremath{\\mathbb{R}}$ as ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\ng_{1}(t)=\\sum_{l=0}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l}t^{l}.\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Suppose $n\\leq d^{(1-\\alpha)k^{*}+(k-k^{*})}$ . Then, ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{P}_{z\\sim P z}\\left[\\exists i\\in[n],\\left|K(z,z^{i})-g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|\\leq d^{-(1-\\alpha)k^{*}-(k-k^{*})}\\right]\\geq1-1/d.\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Proof. First, we note ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\left|K(z,z^{i})-g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|=\\left|\\sum_{l=0}^{\\infty}\\alpha_{l}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)-\\sum_{l=0}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n=\\sum_{\\textstyle\\left.\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\right\\rceil+1}^{\\infty}\\gamma_{\\textstyle l}\\left|\\frac{z^{\\top}z^{i}}{d}\\right|.\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "With probability $1-1/d^{(1-\\alpha)k^{*}+(k-k^{*})+1}$ ,$\\begin{array}{r}{\\left|\\frac{z^{\\top}z^{i}}{d}\\right|\\lesssim d^{-(1-\\alpha)/2}\\sqrt{\\log d}}\\end{array}$ . This means that (2 )is bounded by $\\begin{array}{r}{\\lesssim\\left(\\frac{\\log d}{d^{1-\\alpha}}\\right)^{(\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil+1)/2}\\leq d^{-(1-\\alpha)k^{*}+(k-k^{*})}}\\end{array}$ for a sufficiently large d. By taking the uniform bound over all i , we get the assertion. ",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Ow o this lemma, it suffices to bound $\\begin{array}{r}{\\mathbb{P}_{z\\sim P_{Z}}\\big[\\big|\\sum_{i=1}^{n}\\beta_{i}g_{1}\\big(\\frac{z^{\\top}z^{i}}{d}\\big)\\big|\\ge\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|\\big]}\\end{array}$ Pby $\\Omega(1)$ , because ",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{P}_{z\\sim P_{Z}}\\left[|f_{\\beta}(z)|\\ge\\frac{c}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\displaystyle\\sum_{i=1}^{n}|\\beta_{i}|\\right]}\\\\ &{\\ge\\mathbb{P}_{z\\sim P_{Z}}\\left[\\left|\\displaystyle\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|\\ge\\frac{c+1}{d^{(1-\\alpha)k^{*}+(k-k^{*})}}\\displaystyle\\sum_{i=1}^{n}|\\beta_{i}|\\right]-1/d.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "For this, we lower bound the second moment, which captures the variation of $f_{\\beta}$ .",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Lemma 3. Suppose $a_{l}$ are all positive and define $K_{2}\\in\\mathbb{R}^{n\\times n}$ as ",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(K_{2})_{i,j}=\\sum_{l=0}^{k}\\left(\\frac{z_{k+1:d}^{i}{\\top}z_{k+1:d}^{j}}{d-k}\\right)^{l}.\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Then, for sufficiently large $d$ , we have ",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{2}\\right]\\gtrsim d^{-\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})}\\beta^{\\top}K_{2}\\beta.\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "The proof requires several auxiliary lemmas as follows. We defer the proofs of them after the proof of Lemma 3 .",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Lemma 4. For any integers $p,g\\ge0,$ ,",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{z}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z^{\\top}z^{i})^{p}\\right)\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z^{\\top}z^{i})^{q}\\right)\\right]}\\\\ &{\\ge\\mathbb{E}_{z_{k+1:d}}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{p}\\right)\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{q}\\right)\\right]\\ge0}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Lemm 5. Let $z^{i},z^{j}\\in\\{-1,1\\}^{d}$ ,$z\\in\\{-1,1\\}^{d}$ be a vector sampled uniformly from the hypercube, and let lbe any integer. Then, we can expand the expectation as ",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z}\\left[\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}\\left(\\frac{z^{\\top}z^{j}}{d}\\right)^{l}\\right]=\\sum_{l^{\\prime}=0}^{l}{d^{-l}c_{d,l,l^{\\prime}}}\\left(\\frac{{z^{i}}^{\\top}{z^{j}}}{d}\\right)^{l^{\\prime}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Furthermore, for sufficiently large $d,\\,c_{d,l,l^{\\prime}}\\geq0$ and especially $c_{d,l,l}=(l!)^{2}$ .",
+        "page_idx": 21
+    },
+    {
+        "type": "text",
+        "text": "Proof of Lemma 3 .Let us first expand the target: ",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{z}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{2}\\right]}\\\\ &{=\\mathbb{E}_{z}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}\\sum_{l=0}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}\\right)^{2}\\right]}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 21
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{=\\mathbb{E}_{z}\\left[\\left(\\overbrace{\\sum_{l=0}^{2((1-\\alpha)k^{*}+(k-k^{*}))}\\gamma_{l}}^{2((1-\\alpha)k^{*}+(k-k^{*}))}\\mathcal{I}_{l}\\sum_{i=1}^{n}\\beta_{i}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l}\\right)^{2}\\right]}\\\\ &{=\\displaystyle\\sum_{0\\leq l_{1},l_{2}\\leq\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l_{1}}\\gamma_{l_{2}}\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l_{1}}\\right)\\left(\\sum_{i=1}^{n}\\beta_{i}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)^{l_{2}}\\right)\\right]}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "From Lemma 4 and $\\gamma_{l_{1}},\\gamma_{l_{2}}>0$ , each term is non-negative and ( 23 ) is lower bounded by ",
+        "page_idx": 22
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\left[\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\right.}\\\\ &{\\left.\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\sum_{l=0}^{2}\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\sum_{\\gamma_{l}^{2}\\mathbb{E}_{z_{k+1:d}}}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}\\left(\\frac{z_{k+1:d}^{\\top}z_{k+1:d}^{i}}{d}\\right)^{l}\\right)^{2}\\right]\\right.}\\\\ &{\\left.\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\int\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\int\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\! \n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "Let us define a matrix $K_{1}\\in\\mathbb{R}^{n\\times n}$ so that ( 24 ) is equal to $\\beta^{\\top}K_{1}\\beta$ . For that, we define ",
+        "page_idx": 22
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(K_{1})_{i,j}=\\sum_{l=0}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l}^{2}\\mathbb{E}_{z_{k+1:d}}\\left[\\left(\\frac{z_{k+1:d}^{\\top}z_{k+1:d}^{i}}{d-k}\\right)^{l}\\left(\\frac{z_{k+1:d}^{\\top}z_{k+1:d}^{j}}{d-k}\\right)^{l}\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "According to Lemma 5 ,",
+        "page_idx": 22
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{(K_{1})_{i,j}=\\overbrace{\\sum_{l=0}^{2(1-\\alpha)k^{*}+(k-k^{*}))}}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\gamma_{l}^{2}\\sum_{l^{\\prime}=0}^{l}(d-k)^{-l}c_{d-k,l,l^{\\prime}}\\left(\\frac{z_{k+1:d}^{i}\\top_{z_{k+1:d}^{j}}^{j}}{d}\\right)^{l^{\\prime}}}\\\\ &{\\qquad=\\overbrace{\\sum_{l=0}^{2(1-\\alpha)k^{*}+(k-k^{*}))}}^{\\lceil\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\rceil}\\left(\\overbrace{\\sum_{l^{\\prime\\prime}=l}^{2(1-\\alpha)k^{*}+(k-k^{*}))}}^{\\left(\\frac{2((1-\\alpha)k^{*}+(k-k^{*}))}{1-\\alpha}\\right)}\\gamma_{l^{\\prime\\prime}}^{2}(d-k)^{-l^{\\prime\\prime}}c_{d-k,l^{\\prime\\prime},l}\\right)\\left(\\frac{z_{k+1:d}^{i}\\top_{z_{k+1:d}^{j}}^{j}}{d-k}\\right)^{l}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "Because $c_{d-k,l^{\\prime\\prime},l}\\geq0$ and $\\begin{array}{r}{c_{d-k,l,l}=(l!)^{2},(d-k)^{-l}c_{l}:=\\left(\\sum_{l^{\\prime\\prime}=l}^{2k}\\gamma_{l^{\\prime\\prime}}^{2}(d-k)^{-l^{\\prime\\prime}}c_{d-k,l^{\\prime\\prime},l}\\right)\\gtrsim d^{-l}}\\end{array}$ \u0010P holds. Thus, we ave $\\begin{array}{r}{(d-k)^{-l}c_{l}\\geq d^{-\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})}c}\\end{array}$ for all $l\\leq\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})$ ≤⌊ −⌋−for sufficiently small c, and by defining $K_{2},K_{3}\\in\\mathbb{R}^{n\\times n}$ ∈as ",
+        "page_idx": 22
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{(K_{2})_{i,j}=\\qquad\\underset{l=0}{\\overset{!}{\\sum}}\\underset{i=1}{\\overset{.}{\\sum}}\\quad\\quad\\left(\\frac{z_{k+1:l}^{i}\\overset{\\top}{z}^{j}}{d-k}\\right)^{l}}\\\\ &{(K_{3})_{i,j}=\\qquad\\underset{l=0}{\\overset{!}{\\sum}}\\quad\\quad\\;((d-k)^{-l}c_{l}-d^{-(\\lfloor(1-\\alpha)k^{*}\\rfloor+k-k^{*})}c)\\left(\\frac{z_{k+1:l}^{i}\\overset{\\top}{z}_{k+1:l}^{j}}{d-k}\\right)^{l}}\\\\ &{\\qquad+\\underset{l=\\lfloor(1-\\alpha)k^{*}\\rfloor+k-k+1}{\\overset{\\lceil2((1-\\alpha)k^{*}+(k-k^{*}))\\rceil}{\\sum}}\\quad(d-k)^{-l}c_{l}\\left(\\frac{z_{k+1:l}^{i}\\overset{\\top}{z}_{k+1:l}^{j}}{d-k}\\right)^{l},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "we have $K_{1}=c d^{-\\lfloor(1-\\alpha)k^{*}\\rfloor+k-k^{*}}K_{2}+K_{3}$ . Moreover, $K_{3}$ is positive semi-definite because $K_{3}$ is written as a sum of polynomial kernels with positive coefficients. Thus, we can lower bound $\\beta^{\\top}K_{1}\\beta$ by $d^{-\\lfloor(1-\\alpha)k^{*}\\rfloor-(k-k^{*})}\\beta^{\\top}K_{2}\\beta$ (up to a constant factor). ",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "Proof of Lemma 4 .The proof idea comes from Lemma B.9 of Wei et al. (2019 ). For a set $S\\subseteq[k]$ ,we let $\\textstyle z^{S}=\\prod_{i=1}^{k}z_{i}$ , and for a set $T\\subseteq[d]\\setminus[k]$ , we let $\\textstyle z^{T}=\\prod_{i=1}^{k}z_{i}$ . Expand $(z^{\\top}z^{i})^{p}$ as ",
+        "page_idx": 22
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(z^{\\top}z^{i})^{p}=\\left(\\sum_{j=1}^{d}z_{j}z_{j}^{i}\\right)^{p}=\\sum_{S,T}C_{|S|,|T|,p}z^{S}z^{T}(z^{i})^{S}(z^{i})^{T},\n$$",
+        "text_format": "latex",
+        "page_idx": 22
+    },
+    {
+        "type": "text",
+        "text": "where $c_{|S|,|T|,p}\\geq0$ depends only on $|S|,T$ , and $p$ due to symmetry. Also, we let ",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{p}=\\sum_{T}\\bar{C}_{|T|,p}z_{k+1:d}^{S}z_{k+1:d}^{T}(z_{k+1:d}^{i})^{S}(z_{k+1:d}^{i})^{T}.\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "Note that $C_{0,|T|,p}\\geq\\bar{C}_{|T|,p}\\geq0$ , because $C_{0,|T|,p}$ considers the case where $z_{i}(i\\in[k])$ is multiplied for even number of times. ",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "As a basic fact in Boolean analysis, we have $\\mathbb{E}_{z}[z^{S}z^{T}z^{S^{\\prime}}z^{T^{\\prime}}]\\,=\\,0$ unless $S\\,=\\,S^{\\prime}$ and $T\\,=\\,T^{\\prime}$ .Therefore, ",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{\\boldsymbol\\varepsilon}\\left[\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}(z^{\\top}z^{i})^{p}\\right)\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}(z^{\\top}z^{i})^{q}\\right)\\right]}\\\\ &{=\\mathbb{E}_{\\boldsymbol\\varepsilon}\\left[\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}\\underset{0\\leq i}{\\sum}C_{|\\mathcal{S}|,\\Gamma|,\\Gamma|,g}s^{\\mathcal{S}}z^{T}(z^{i})^{S}(z^{\\ast})^{T}\\right)\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}\\underset{0\\leq i}{\\sum}C_{|\\mathcal{S}|,|\\Gamma|,\\Gamma|,q}z^{s}z^{T}(z^{i})^{S}(z^{\\ast})^{T}\\right)\\right]}\\\\ &{=\\underset{s,T}{\\sum}\\mathbb{E}_{\\boldsymbol\\varepsilon}\\left[\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}C_{|\\mathcal{S}|,|\\Gamma|,\\Gamma|,g}(z^{i})^{s}(z^{\\ast})^{T}\\right)\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}C_{|\\mathcal{S}|,|\\Gamma|,\\Gamma|,q}z^{s}z^{T}(z^{i})^{S}(z^{\\ast})^{T}\\right)\\right]}\\\\ &{=\\underset{s,T}{\\sum}d^{2|\\mathcal{S}|,\\mathcal{O}}C_{|\\mathcal{S}|,|\\Gamma|,\\Gamma|,g}C_{|\\mathcal{S}|,|\\Gamma|,\\Gamma|}\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}\\right)^{2}}\\\\ &{\\geq\\underset{T}{\\sum}C_{|\\mathcal{S}|,|\\Gamma|,\\mathcal{O}}C_{0,1\\Gamma|,q}\\left(\\underset{i=1}{\\overset{n}{\\sum}}\\beta_{i}\\right)^{2}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "Where we used $C_{|S|,|T|,p},C_{|S|,|T|,q}\\geq0$ . On the other hand, ",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{S}_{z_{k+1:d}}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{p}\\right)\\left(\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{q}\\right)\\right]=\\sum_{T}\\bar{C}_{|T|,p}\\bar{C}_{|T|,q}\\left(\\sum_{i=1}^{n}\\beta_{i}\\right)^{2}\\geq0.\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "Because $c_{|S|,|T|,p}\\geq\\bar{C}_{T,p}$ and $c_{|S|,|T|,q}\\geq\\bar{C}_{T,q}$ , comparing ( 25 ) and ( 26 ) yields ",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{z}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z^{\\top}z^{i})^{p}\\right)\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z^{\\top}z^{i})^{q}\\right)\\right]}\\\\ &{\\geq\\mathbb{E}_{z_{k+1:d}}\\left[\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{p}\\right)\\left(\\displaystyle\\sum_{i=1}^{n}\\beta_{i}(z_{k+1:d}^{\\top}z_{k+1:d}^{i})^{q}\\right)\\right]\\geq0,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "which concludes the proof. ",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "Proof of Lemma 5 .LHS is determined by how many coordinates are different between $z^{i}$ and $z^{j}$ ,which is captured by $z^{i^{\\top}}z^{j}$ . Thus, LHS is the polynomial of $z^{i^{\\top}}z^{j}$ . Moreover, its degree is at most $l$ because the degrees of $z^{\\top}z^{i}$ and $z^{\\top}z^{j}$ are at most $l$ in LHS. Thus the LHS can be written as $\\begin{array}{r}{\\sum_{l^{\\prime}=0}^{l}c_{d,l,l^{\\prime}}\\bigl(\\frac{{z^{i}}^{\\top}z^{j}}{d^{2}}\\bigr)^{l^{\\prime}}}\\end{array}$ therefore ′$c_{d,l,l^{\\prime}}=0$ dfor odd . Note l$l^{\\prime}$ hat, when . On the other hand, when $l$ is even, LHS is lnvariant is odd, $c_{d,l,l^{\\prime}}=0$ for even acement $z^{j}\\mapsto-z^{j}$ $l^{\\prime}$ ., and Let us evaluate $c_{d,l,l^{\\prime}}$ . By multiplying $d^{l}$ on both sides, we have ",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z}\\left[\\left(\\frac{z^{\\top}z^{i}}{\\sqrt{d}}\\right)^{l}\\left(\\frac{z^{\\top}z^{j}}{\\sqrt{d}}\\right)^{l}\\right]=\\sum_{l^{\\prime}=0}^{l}c_{d,l,l^{\\prime}}\\left(\\frac{{z^{i}}^{\\top}z^{j}}{d}\\right)^{l^{\\prime}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "By taking $d\\to\\infty$ (while fixing the angle $\\frac{z^{i^{\\textsf{T}}}z^{j}}{d}.$ ), LHS will converge into ",
+        "page_idx": 23
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{g}\\left[\\left(\\frac{g^{\\top}z^{i}}{\\sqrt{d}}\\right)^{l}\\left(\\frac{g^{\\top}z^{j}}{\\sqrt{d}}\\right)^{l}\\right],\n$$",
+        "text_format": "latex",
+        "page_idx": 23
+    },
+    {
+        "type": "text",
+        "text": "here $g$ follows $\\mathbb{S}^{d-1}({\\sqrt{d}})$ wonsi r the e expans on of $\\begin{array}{r}{t^{l}=\\sum_{l^{\\prime}=0}^{l}c_{l,l^{\\prime}}H e_{l^{\\prime}}(t)}\\end{array}$ . If $l$ is even, $\\begin{array}{r}{c_{l,l^{\\prime}}=\\frac{1}{2^{\\frac{l-l^{\\prime}}{2}}(\\frac{l-l^{\\prime}}{2})!l!}>0}\\end{array}$ for even $l^{\\prime}$ and $c_{l,l^{\\prime}}=0$ for odd l$l^{\\prime}$ . If $l$ is odd, $\\begin{array}{r}{c_{l,l^{\\prime}}=\\frac{1}{2^{\\frac{l-l^{\\prime}}{2}}(\\frac{l-l^{\\prime}}{2})!l!}>0}\\end{array}$ for odd $l^{\\prime}$ and $c_{l,l^{\\prime}}=0$ for even $l^{\\prime}$ . By using these Hermite coefficients, ( 27 ) is equal to ",
+        "page_idx": 24
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sum_{l^{\\prime}=0}^{l^{\\prime}}c_{l,l^{\\prime}}^{2}\\left(\\frac{\\boldsymbol{z}^{i^{\\top}}\\boldsymbol{z}^{j}}{d}\\right)^{l^{\\prime}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Note that, as a function of the angle $\\frac{z^{i^{\\top}}z^{j}}{d}\\in[-1,1]$ , the convergence is uniform. Therefore, we get ",
+        "page_idx": 24
+    },
+    {
+        "type": "equation",
+        "text": "$$\nd^{-l}c_{d,l,l^{\\prime}}\\to c_{l,l^{\\prime}}^{2}\\quad(d\\to\\infty)\n$$",
+        "text_format": "latex",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "for all $l$ and $l^{\\prime}$ . When $c_{l,l^{\\prime}}^{2}=0,c_{d,l,l^{\\prime}}=0$ for all $d$ as we saw above. When $c_{l,l^{\\prime}}^{2}>0$ , there exists $d$ such that $c_{d^{\\prime},l,l^{\\prime}}>0$ f$d^{\\prime}\\geq d$ . Therefore, for sufficiently large $d$ , we have $c_{d,l,l^{\\prime}}\\geq0$ . Moreover, by direct calculation, $c_{d,l,l}=(l!)^{2}$ .",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "After obtained Lemma 3 we would like to bound $d^{-\\lfloor(1-\\alpha)k\\rfloor}{\\beta}^{\\top}K_{2}\\beta$ . For this, we use the lower bound the smallest eigenvalue of $K_{2}$ .",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Let $K_{(d)}$ $(d=1,2,\\cdots)$ )be a sequence of inner-product kernels with $\\begin{array}{r}{K_{(d)}(z,z^{\\prime})\\,=\\,h_{(d)}(\\frac{z^{\\top}z^{\\prime}}{d})}\\end{array}$ .Consider the case when each $K_{(d)}$ is associated with the same kernel function $h\\colon[-1,1]\\ \\to\\ \\mathbb{R}$ ,so that $h_{(d)}=h$ holds for all $z,z^{\\prime}\\in\\{-1,1\\}^{d}$ . The following Le a requires $h$ is a degree$k$ polynomial and its coefficients are positive for all degrees. Note that $K_{2}$ satisfies these conditions. ",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Lemma 6 (Misiakiewicz (2022 )) .Assume the following conditions hold: ",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "(a) $h^{(k^{\\prime})}(0)>0\\,f o r\\,k^{\\prime}=0,\\cdots\\,,k-1.$ (b) $h^{(k)}(0)>0$ .(c) $h(\\cdot)$ is $k$ -times differentiable. ",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "$\\delta\\,>\\,0$ bitraril and assume $d\\gg1$ $n\\,\\lesssim\\,d^{k}e^{-a_{d}\\sqrt{\\log d}}$ for some $\\{a_{d}\\}$ $a_{d}\\to\\infty(d\\to\\infty)$ →∞ →∞ . Given ni.i.d. sample {$\\{z^{i}\\}_{i=1}^{n}$ }from $P_{Z}$ , we construct a kernel matrix $\\bar{K}\\in\\mathbf{\\bar{R}}^{n\\times n}$ ∈as $\\begin{array}{r}{(K_{(d)})_{i,j}~=~h\\big(\\frac{z^{i^{\\top}}z^{j}}{d}\\big)}\\end{array}$ . Then, the kernel matrix $K_{(d)}$ can be decomposed into two positive semi-definite kernel $K_{>k-1}$ and $K_{\\leq k-1}$ , and the spectrum of $K_{>k-1}$ is bounded by ",
+        "page_idx": 24
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{\\{z^{i}\\}_{i=1}^{n}}\\left[\\|K_{>k-1}-h^{(k)}(0)I\\|_{\\mathrm{op}}^{2}\\right]\\to0\\quad(d\\to\\infty).\n$$",
+        "text_format": "latex",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Proof. See Section 3.2 of Misiakiewicz (2022 ), where we take $\\kappa=k-\\delta$ .",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Therefore, f ny fix $\\delta>0$ $d\\gg1$ $n\\lesssim d^{\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})-\\delta}$ , all the a satisfied for Note that we can take $K_{2}$ with $a_{d}=(\\log d)^{\\frac{1}{4}}$ $k=\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})$ ⌊−so that and ⌋−$d^{k}e^{-a_{d}\\sqrt{\\log d}}\\gtrsim d^{k-\\delta}$ (if we regard $K_{2}$ as a kernel in . Then, the smallest eigenvalue $\\mathbb{R}^{d-k^{\\star}}\\times\\mathbb{R}^{d-k})$ ×). of $K_{>k-1}$ is lower b nded by $\\Omega(1)$ with probability at least 0 .99 over the randomly drawn sample, for sufficiently large d. This immediately implies that the smallest eigenvalue of $K_{2}$ is bounded by $\\Omega(1)$ with probability at least 0 .99 .",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Now we finalize the proof of Theorem 3 .",
+        "page_idx": 24
+    },
+    {
+        "type": "text",
+        "text": "Proof of Theorem 3 .According to Lemmas 3 and 6 , for all choices of $\\beta$ , with probability at least 0 .99 over the randomly drawn sample, we have ",
+        "page_idx": 24
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l r}{\\lefteqn{\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{2}\\right]\\gtrsim d^{-\\lfloor(1-\\alpha)k^{*}\\rfloor-(k-k^{*})}\\sum_{i=1}^{n}\\beta_{i}^{2}}}\\\\ &{}&{\\geq\\frac{1}{d^{\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})}n}\\left(\\displaystyle\\sum_{i=1}^{n}|\\beta_{i}|\\right)^{2}}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 24
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\gtrsim\\frac{1}{d^{2\\lfloor(1-\\alpha)k^{*}\\rfloor+2(k-k^{*})-\\delta}}\\left(\\sum_{i=1}^{n}|\\beta_{i}|\\right)^{2}.\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "Because $g_{1}$ is a degree$2k$ polynomial, Bonami’s Lemma (e.g., Theorem 9.21 of ( O’Donnell ,2014 )) yields ",
+        "page_idx": 25
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{4}\\right]\\geq\\frac{1}{(2k-1)^{4k}}\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{2}\\right]^{2}\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "As a result, the Paley–Zygmund inequality (see Theorem 9.4 of ( O’Donnell ,2014 )) yields ",
+        "page_idx": 25
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{P}_{z}\\left[\\left|\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|\\geq t\\mathbb{E}_{z}\\left[\\left(\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right)^{2}\\right]^{\\frac{1}{2}}\\right]\\geq\\frac{(1-t^{2})^{2}}{(2k-1)^{4k}}\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "for all $0\\le t\\le1$ .",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "Combining ( 28 ) and ( 31 ), with probability 0 .99 over the sample, we have ",
+        "page_idx": 25
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\left|\\sum_{i=1}^{n}\\beta_{i}g_{1}\\left(\\frac{z^{\\top}z^{i}}{d}\\right)\\right|\\gtrsim\\frac{1}{d^{\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})-\\delta/2}}\\sum_{i=1}^{n}|\\beta_{i}|.\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "with probability $\\Omega(1)$ over the choice of $z$ . By taking sufficiently large $d$ ,$\\frac{1}{d\\lfloor(1-\\alpha)k^{*}\\rfloor+(k-k^{*})-\\delta/2}$ is larger than $\\frac{1\\!+\\!c}{d\\!\\lfloor(1\\!-\\!\\alpha)k^{*}\\rfloor\\!+\\!(k\\!-\\!k^{*})}$ ($c$ is a constant from Lemma 1 ). Thus, using Lemma 2 , we get ⌊−−",
+        "page_idx": 25
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{P}_{z\\sim P z}\\left[|f_{\\beta}(z)|\\ge\\frac{c}{d^{[(1-\\alpha)k^{*}]+(k-k^{*})}}\\sum_{i=1}^{n}|\\beta_{i}|\\right]\\gtrsim1-1/d.\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "Now we apply Lemma 1 and finally obtain ",
+        "page_idx": 25
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{P}_{z\\sim P_{Z}}\\left[f_{\\beta}(z)y<0\\right]\\gtrsim1-2/d,\n$$",
+        "text_format": "latex",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "which concludes the proof. ",
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "DDETAILS OF THE EXPERIMENT ",
+        "text_level": 1,
+        "page_idx": 25
+    },
+    {
+        "type": "text",
+        "text": "We describe the experiment settings for Figure 1 . We considered an anisotropic $d$ -dimensional 3 -sparse parity problem (Example 2 ): $y=z_{1}z_{2}z_{3}$ ,$s_{1}=s_{2}=s_{3}=\\alpha/\\sqrt{d}$ , and $\\dot{s}_{4}=\\cdots=1/\\sqrt{d}$ .Here $\\alpha$ controls the alignment of the distribution to the feature, or the signal-to-noise ratio. We fixed the dimension $d$ to 300 , and varied $n$ and $\\alpha$ . We trained the neural network (2 )with $\\bar{R}=15$ .Specifically, we employed the width $N\\,=\\,2000$ as a finite neuron approximation, and initialized neurons so that each of them followed the standard normal distribution (and thus the network was rotation invariant at the initialization). By using the logistic loss, we updated the network by the discretized MLFD (6 )by setting $\\eta=0.25$ ,$\\lambda_{1}=0.1$ , and $\\lambda=0.1\\alpha^{2}/d$ (fixed during the training) by following Corollary 1 , until $T=10000$ . We ran the experiment 5 times with different seeds and plotted the mean for each $n$ and $\\alpha$ .",
+        "page_idx": 25
+    }
+]
