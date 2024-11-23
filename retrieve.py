@@ -13,9 +13,9 @@ transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
 date: {date}
 images: {images}
-description: AI-generated podcast from the PDF file {folder}
+description: AI-generated podcast from the PDF file {folder} / {num}
 layout: article
-title: {folder} / {num}
+title: {folder}
 ---
 
 ## Transcription
@@ -122,7 +122,7 @@ for i, folder in enumerate(folders):
 
     # Extract images from the PDF file
     image_paths = []
-    pdf_image_folder = os.path.join("pdf", str(num), "auto", "images")
+    pdf_image_folder = os.path.join("images", str(num))
     if os.path.exists(pdf_image_folder):
         image_paths = [
             os.path.join(pdf_image_folder, f) for f in os.listdir(pdf_image_folder)

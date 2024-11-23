@@ -1,0 +1,1676 @@
+[
+    {
+        "type": "text",
+        "text": "Feature learning via mean-field Langevin dynamics: classifying sparse parities and beyond ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Taiji Suzuki 1 ,, Denny $\\mathbf{W}\\mathbf{u}^{3,4}$ , Kazusato $\\mathbf{O}\\mathbf{k}\\mathbf{o}^{1,2}$ , Atsushi Nitanda 2 ,",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 University of Tokyo, 2 RIKEN AIP, 3 New York University, 4 Flatiron Institute, 5 Kyushu Institute of Technology taiji@mist.i.u-tokyo.ac.jp ,dennywu@nyu.edu ,oko-kazusato@g.ecc.u-tokyo.ac.jp ,nitanda@ai.kyutech.ac.jp ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Abstract ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Neural network in the mean-field regime is known to be capable of feature learning ,unlike the kernel (NTK) counterpart. Recent works have shown that mean-field neural networks can be globally optimized by a noisy gradient descent update termed the mean-field Langevin dynamics (MFLD). However, all existing guarantees for MFLD only considered the optimization efficiency, and it is unclear if this algorithm leads to improved generalization performance and sample complexity due to the presence of feature learning. To fill this important gap, in this work we study the sample complexity of MFLD in learning a class of binary classification problems. Unlike existing margin bounds for neural networks, we avoid the typical norm control by utilizing the perspective that MFLD optimizes the distribution of parameters rather than the parameter itself; this leads to an improved analysis of the sample complexity and convergence rate. We apply our general framework to the learning of $k$ -sparse parity functions, where we prove that unlike kernel methods, two-layer neural networks optimized by MFLD achieves a sample complexity where the degree $k$ is “decoupled” from the exponent in the dimension dependence. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1 Introduction ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Mean-field Langevin dynamics. The optimization dynamics of two-layer neural networks in the mean-field regime can be described by a nonlinear partial differential equation of the distribution of parameters ( Nitanda and Suzuki ,2017 ;Chizat and Bach ,2018 ;Mei et al. ,2018 ;Rotskoff and VandenEijnden ,2018 ;Sirignano and Spiliopoulos ,2020 ). Such a description has multiple advantages: (i )global convergence guarantees can be obtained by exploiting convexity of the loss function, and $(i i)$ the parameters are allowed to evolve away from initialization and learn informative features, in contrast to the neural tangent kernel (“lazy”) regime ( Jacot et al. ,2018 ). ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Among the gradient-based optimization algorithms for mean-field neural networks, the mean-field Langevin dynamics (MFLD) ( Mei et al. ,2018 ;Hu et al. ,2019 ) is particularly attractive due to the recently established quantitative optimization guarantees. MFLD arises from a noisy gradient descent update on the parameters, where Gaussian noise is injected to the gradient to encourage “exploration”. It has been shown that MFLD globally optimizes an entropy-regularized convex functional in the space of measures, and for the infinite-width and continuous-time dynamics, the convergence rate is exponential under suitable isoperimetric conditions ( Nitanda et al. ,2022 ;Chizat ,2022 ). Furthermore, uniform-in-time estimates of the particle discretization error have also been established ( Suzuki et al. ,$2023\\mathrm{a}$ ;Chen et al. ,2022 ), meaning that optimization guarantees for the infinite-dimensional problem can be effectively translated to a finite-width neural network. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "However, existing analyses of MFLD only considered the optimization of neural networks; this alone does not demonstrate the benefit of mean-field regime nor the presence of feature learning. Therefore, an important problem is to characterize the generalization of the learned models, and prove efficient sample complexity guarantees. The goal of this work is to address the following question. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Can we show that neural network $^+$ simple noisy gradient descent (MFLD) efficiently learns an interesting class of functions, with a better rate of convergence compared to the “lazy” regime? ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Learning sparse parity functions. One particularly relevant learning task is the $k$ -sparse parity problem, where the response $y$ is given by the sign of the product of $k$ coordinates of the input (on hypercube); as a special case, setting $k=2$ recovers the classical XOR problem. When $k\\ll d$ , this target function is low-dimensional, and hence we expect feature learning to be beneficial in that it can “zoom in” to relevant subspace. In contrast, for kernel methods (including neural networks in the lazy regime) which cannot adapt to such structure, it has been shown that a sample complexity of $n\\doteq\\bar{\\Omega(d^{k})}$ is unavoidable ( Ghorbani et al. ,2019 ;Hsu ;Abbe et al. ,2022 ). ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "For the XOR case $\\;k=2\\;$ ), recent works have shown that neural networks in the mean-field regime can achieve a sample complexity of $n=\\mathcal{O}(d/\\epsilon)$ (Wei et al. ,2019 ;Chizat and Bach ,2020 ;Telgarsky ,2023 ), which indeed improves upon the NTK complexity ( Ji and Telgarsky ,2019 ). However, all these results directly assumed convergence of the dynamics $\\mathbf{\\chi}^{t}\\rightarrow\\infty$ ) with no iteration complexity. Moreover, Wei et al. (2019 ); Chizat and Bach (2020 ) directly analyzed the infinite-width limit, and while Telgarsky (2023 ) provided a finite-width characterization, the dynamics is restricted to the low-rotation regime, and a very large number of particles $N\\,=\\,\\mathcal{O}(d^{d})$ is required. Lastly, these analyses are specialized to XOR, and do not directly generalize to the k-parity setting. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1.1 Our Contributions ",
+        "text_level": 1,
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In this work, we bridge the aforementioned gap by presenting a simple and general framework to establish sample complexity of MFLD in learning binary classification problems. We then apply this framework to the sparse $k$ -parity problem, and obtain improved rate of convergence for the fully timeand space-discretized algorithm. More specifically, our contributions can be summarized as follows. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "•We present a general framework to analyze MFLD in the learning of binary classification tasks. Our framework has two main ingredients: $(i)$ an annealing procedure that applies to common classification losses that removes the exponential dependence on regularization parameters in the logarithmic Sobolev inequality , and $(i i)$ a novel local Rademacher complexity analysis for the distribution of parameters optimized by MFLD. As a result, we can obtain generalization guarantee for the learned neural network in discrete-time and finite-width settings. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "•We apply our general framework to the $k$ -sparse parity problem, and derived learning guarantees with improved rate of convergence and dimension dependence, as shown in Table 1 . Specially, in the $n\\asymp d^{2}$ regime we obtain exponentially converging classification error, whereas in the $n\\asymp d$ regime we achieve linear dimension dependence. Note that this improves upon the NTK analysis (which gives a sample complexity of $\\dot{n}\\,=\\,\\Omega(d^{k}))$ in that it “decouple” the degree $k$ from the exponent in the dimension dependence. Our theoretical results are supported by empirical findings. ",
+        "page_idx": 1
+    },
+    {
+        "type": "table",
+        "img_path": "images/48f55d076f814c1c61947a143c02cc8651b1399d4780befd903d891f9bddd10a.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Table 1: Statistical and computational complexity (omitting poly-log terms) for the $k$ -sparse (or 2-sparse) parity problem. Column “ $^{\\,\\prime}k$ -parity” indicates applicability to the general $k$ -sparse parity setting, and for references that does not handle $k$ -parity we state the complexity for 2-parity (XOR). $d$ is the input dimensionality, and $_n$ is the sample size. For SGD, $n$ is the total sample size given by product of mini-batch size and iterations. ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1.2 Additional Related Works ",
+        "text_level": 1,
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "In addition to the mean-field analysis, parity-like functions can be learned via other feature learning procedures such as the one gradient step analysis in Daniely and Malach (2020 ); Ba et al. (2022 ); ",
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Damian et al. (2022 ); Barak et al. (2022 ). Such analysis requires nontrivial gradient concentration at initialization, which translates to a sample complexity that scales as $n=\\Theta\\bar{(d^{k})}$ (Barak et al. ,2022 ). For “narrow” neural networks, Abbe et al. (2023 ) showed that a modified projected (online) gradient descent algorithm can learn the $k$ -parity problem with a sample complexity of $n=O(d^{k-\\bar{1}}+\\epsilon^{-c})$ (for some unknown $c$ ). Also, Refinetti et al. (2021 ); Ben Arous et al. (2022 ) showed that a two-layer ReLU network with more than 4 neurons can learn the Gaussian XOR problem with gradient descent. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2 Problem Setting ",
+        "text_level": 1,
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Throughout this paper, we consider a classification problem given by the following model: ",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\nY=\\mathbf{1}_{A}(Z)-\\mathbf{1}_{A^{c}}(Z)\\in\\{\\pm1\\}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $Z\\,=\\,(Z_{1},\\ldots,Z_{d})$ is the input random variable on $\\mathbb{R}^{d}$ and ${\\mathbf{1}}_{A}$ is the indicator function corr onding to a measurabl set $A\\in\\mathbb{B}(\\mathbb{R}^{d})$ , i.e., $\\mathbf{1}_{A}(Z)=1$ if $Z\\in A$ $\\mathbf{1}_{A}(Z)=0$ if $Z\\not\\in A$ .Let $P_{Z}$ be the distribution of Z. We are given input-output pairs $D_{n}=(z_{i},y_{i})_{i=1}^{n}$ independently identically distributed from this model as training data. Then, we construct a binary classifier that predicts the label for the test input data as accurate as possible. To achieve this, we learn a two-layer neural network model in the mean-field regime via the mean-field Langevin dynamics .",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "One important problem setting for our analysis is the $k$ -sparse parity problem defined as follows. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Example 1 ($k$ -sparse parity problem) .$P_{Z}$ is the uniform distribution on the grid $\\{\\pm1/\\sqrt{d}\\}^{d}$ }and $A=\\{\\zeta=(\\zeta_{1},\\ldots,\\zeta_{d})\\in\\{\\pm1/\\sqrt{d}\\}^{d}\\mid\\zeta_{1}\\cdots\\zeta_{k}>0\\}^{1}$ }|· · · }.",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "As a special case, $k=2$ (XOR) has been extensively studied ( Wei et al. ,2019 ;Telgarsky ,2023 ). ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Mean-field two-layer network. Given input $z$ , let $h_{x}(z)$ be one neuron in a two-layer neural network with parameter $\\boldsymbol{x}=(x_{1},x_{2},x_{3})\\in\\mathbb{R}^{d+1+1}$ defined as ",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{h_{x}(z)=\\bar{R}[\\operatorname{tanh}(z^{\\top}x_{1}+x_{2})+2\\operatorname{tanh}(x_{3})]/3,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "where $\\bar{R}\\in\\mathbb{R}$ is a hyper-pa determining the scale of the work 2 . We place an extra tanh activation for analysis. Let $\\sigma$ Pbe the set e bias term nR$\\mathbb{R}^{\\bar{d}}$ $x_{3}\\in\\mathbb{R}$ ∈probability measures on and $\\mathcal{P}_{p}$ because the bounde be the subset of $(\\mathbb{R}^{\\bar{d}},\\bar{B}(\\mathbb{R}^{\\bar{d}}))$ $\\mathcal{P}$ such that its B$h_{x}$ is requi where $p$ -th moment is boun $\\bar{d}=d+2$ and onve B$\\bar{B}(\\mathbb{R}^{\\bar{d}})$ d: $\\mathbb{E}_{\\mu}[\\|X\\|^{p}]<\\infty\\,(\\mu\\in\\mathcal{P})$ ∥∥∞∈P . The mean-field neural network is defined as an integral over neurons $h_{x}$ ,",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{f_{\\mu}(\\cdot)=\\int h_{x}(\\cdot)\\mu(\\mathrm{d}x),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "for $\\mu\\in\\mathcal P$ . To evaluate the performance of $f_{\\mu}$ , we define the empirical risk and the population risk as ",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{L(\\mu):=\\frac{1}{n}\\sum_{i=1}^{n}\\ell(y_{i}f_{\\mu}(z_{i})),\\;\\;\\bar{L}(\\mu):=\\mathbb{E}[\\ell(Y f_{\\mu}(Z))],}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "resp $\\ell:\\mathbb{R}\\rightarrow\\mathbb{R}_{\\geq0}$ s a c s fun In particular, we consider the logistic loss $\\ell(f,y)=\\log(1+\\exp(-\\Bar{y f}))$ $y\\in\\{\\pm1\\}$ $f\\in\\mathbb{R}$ To avo ing, we consider a regularized empirical risk parameters. One advantage of this mean-field definition is that $F(\\mu):=L(\\mu)+\\lambda\\mathbb{E}_{X\\sim\\mu}[\\lambda_{1}\\|X\\|^{2}]$ ∼∥∥,$f_{\\mu}$ here is a linear with respect to $\\lambda,\\lambda_{1}\\ge0$ ≥are regular µation , and hence the functional $L(\\mu)$ becomes a convex functional. ",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Mean-field Langevin dynamics. We optimize the training objective via MFLD, which is given by the following stochastic differential equation: ",
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathrm{d}X_{t}=-\\nabla\\frac{\\delta F(\\mu_{t})}{\\delta\\mu}(X_{t})\\mathrm{d}t+\\sqrt{2\\lambda}\\mathrm{d}W_{t},\\quad\\mu_{t}=\\mathrm{Law}(X_{t}),\n$$",
+        "text_format": "latex",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "here $X_{0}\\sim\\mu_{0}$ ,$\\operatorname{Law}(X)$ denotes the distribution of the random variable $X$ and $(W_{t})_{t\\geq0}$ is the $d$ -dimensional standard Brownian motion. Readers may refer to Theorem 3.3 of Huang et al. (2021 )for the existence and uniqueness of the solution. Here, $\\frac{\\delta F(\\mu_{t})}{\\delta\\mu}$ is the first variation of $F$ .",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Definition 1. For a functional $G:\\mathcal{P}\\xrightarrow{}\\mathbb{R}$ , the first-variation $\\begin{array}{r}{\\frac{\\delta G}{\\delta\\mu}(\\mu)}\\end{array}$ at $\\mu\\,\\in\\,\\mathcal P$ is a continuous functional $\\mathcal{P}\\times\\mathbb{R}^{d}\\rightarrow\\mathbb{R}$ satisfying $\\begin{array}{r}{\\operatorname*{lim}_{\\epsilon\\to0}\\frac{G(\\epsilon\\nu+(1-\\epsilon)\\mu)}{\\epsilon}=\\int\\frac{\\delta G}{\\delta\\mu}(\\mu)(\\dot{x})\\mathrm{d}(\\nu-\\mu).}\\end{array}$ Rfor any $\\nu\\in\\mathcal{P}$ .",
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "In our setting, we have $\\begin{array}{r}{\\frac{\\delta F(\\mu)}{\\delta\\mu}(x)=\\frac{1}{n}\\sum_{i=1}^{n}\\ell^{\\prime}(y_{i}f_{\\mu}(z_{i}))y_{i}h_{x}(z_{i})+\\lambda(\\lambda_{1}||x||^{2})}\\end{array}$ P. It is known that the Fokker-Planck equation of the SDE ( 1 ) is given by 3 ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\partial_{t}\\mu_{t}=\\lambda\\Delta\\mu_{t}+\\nabla\\cdot\\left[\\mu_{t}\\nabla\\frac{\\delta F(\\mu_{t})}{\\delta\\nu}\\right]=\\nabla\\cdot\\left[\\mu_{t}\\nabla\\left(\\lambda\\log(\\mu_{t})+\\frac{\\delta F(\\mu_{t})}{\\delta\\nu}\\right)\\right].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Then, we can verify that this is equivalent to the Wasserstein gradient flow to optimize the following entropy regularized risk ( Mei et al. ,2018 ;Hu et al. ,2019 ): ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\n{\\mathcal{L}}(\\mu)=F(\\mu)+\\lambda{\\mathrm{Ent}}(\\mu)=L(\\mu)+\\lambda{\\mathrm{KL}}(\\nu,\\mu)+({\\mathrm{const.}})\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\begin{array}{r}{\\mathrm{KL}(\\nu,\\mu)\\,=\\,\\int\\log(\\mu/\\nu)\\mathrm{d}\\mu}\\end{array}$ Ris the KL divergence between $\\nu$ and $\\mu$ , and $\\nu$ is the Gaussian distribution with mean 0 and variance $I/(2\\lambda_{1})$ , i.e., $\\nu=\\mathcal{N}(0,I/(2\\lambda_{1}))$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "For a practical algorithm, we need to consider a space- and time-discretized version of the MFLD, that is, we approximate the solution $\\mu_{t}$ by an empirical measure $\\begin{array}{r}{\\mu_{\\mathcal{X}}=\\frac{1}{N}\\sum_{i=1}^{N}\\delta_{X_{i}}}\\end{array}$ Pcorresponding to a set of finite particles $\\mathcal{X}=(X^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}.$ et $\\mathcal{X}_{\\tau}=(X_{\\tau}^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}$ Nparticles at the $\\tau$ -th update $(\\tau\\in\\{0,1,2,\\ldots\\})$ , and define $\\mu_{\\tau}=\\mu_{\\mathcal{X}_{\\tau}}$ as a finite part xima of the population counterpart. Then, the discretized MFLD is defined as follows: $X_{0}^{i}\\sim\\mu_{0}$ ∼, and $\\mathcal{X}_{\\tau}$ is updated as ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\nX_{\\tau+1}^{i}=X_{\\tau}^{i}-\\eta\\nabla\\frac{\\delta F(\\mu_{\\tau})}{\\delta\\mu}(X_{\\tau}^{i})+\\sqrt{2\\lambda\\eta}\\xi_{\\tau}^{i},\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\eta>0$ is the step size, and $\\xi_{\\tau}^{i}\\sim_{i.i.d.}N(0,I)$ ∼. This is the Euler-Maruyama approximation of the MFLD with a discretized measure; we present the discretization error bounds in the next section. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "3 Main Assumptions and Theoretical Tools ",
+        "text_level": 1,
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "In this section, we introduce the basic assumptions and technical tools for our analysis. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Condition on the loss function To derive the convergence of the classification error, we assume that the loss function satisfies the following condition. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Assumption 1. The convex loss function $\\ell:\\mathbb{R}\\rightarrow\\mathbb{R}_{\\geq0}$ satisfies the following conditions: ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "•$\\ell$ is first order differentiable, its derivative is Lipschitz continuous and its derivative is bounded by $^{\\,l}$ :$|\\ell^{\\prime}(x)-\\ell^{\\prime}(x^{\\prime})|\\leq C|x-x^{\\prime}|$ and $\\operatorname*{sup}_{x}|\\ell^{\\prime}(x)|\\leq1$ .  \n•$\\ell$ is monotonically decreasing, and is classification calibrated: $\\ell^{\\prime}(0)<0$ (Bartlett et al. ,2006 ).   \n•$\\psi(u)^{-1}:=\\ell(0)-(\\ell(u)-u\\ell^{\\prime}(u))>0$ for any $u>0$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "This standard assumption is satisfied by several loss functions such as the logistic loss. We remark that the first assumption is used to show the well-definedness of the mean-field Langevin dynamics and derive its discretization error, and also to obtain a uniform generalization error bound through the classical contraction argument ( Boucheron et al. ,2013 ;Ledoux and Talagrand ,1991 ). The second and third assumptions are used to show the convergence of classification error of our estimator. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Logarithmic Sobolev inequality. Nitanda et al. (2022 ); Chizat (2022 ) showed that the convergence of MFLD crucially relies on properties of the proximal Gibbs distribution whose density is given by ",
+        "page_idx": 3
+    },
+    {
+        "type": "equation",
+        "text": "$$\np_{\\mu}(X)\\propto\\exp\\left(-\\frac{1}{\\lambda}\\frac{\\delta F(\\mu)}{\\delta\\mu}(X)\\right),\n$$",
+        "text_format": "latex",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "where $\\mu\\in\\mathcal P$ . By the s othness of the loss fun on (Assumption 1 ) and the tanh activation, we can show that the objective Lhas a unique solution $\\mu^{*}$ which is also a proximal Gibbs measure of itself. ",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "$\\mathcal{P}_{2}$ Poptimal solution if and only if oposition 1 that is absolutely continu (Proposition 2.5 of $\\mu^{*}$ with respect to the Lebesgue measure. Moreover, is absolutely continuous and its density function is given by Hu et al. (2019 )) .The functional $\\mathcal{L}$ has a uniqu $\\mu^{*}\\in\\mathcal{P}_{2}$ ∈P izer in is the $p_{\\mu^{*}}$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "The next question is how fast the solution $\\mu_{t}$ converges to the optimal solution $\\mu^{*}$ . As we will see, the convergence of MFLD heavily depends on a logarithmic Sobolev inequality (LSI) on $p_{\\mu}$ .",
+        "page_idx": 3
+    },
+    {
+        "type": "text",
+        "text": "Definition 2 (Logarithmic So nequality) .Let $\\mu$ be a pro sure on $(\\mathbb{R}^{d},B(\\mathbb{R}^{d}))$ .$\\mu$ satisfies the LSI with constant $\\alpha>0$ if for any smooth function $\\phi:\\mathbb{R}^{\\dot{d}}\\rightarrow\\mathbb{R}$ →with $\\mathbb{E}_{\\mu}[\\phi^{2}]<\\infty$ ,",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{\\mu}[\\phi^{2}\\log(\\phi^{2})]-\\mathbb{E}_{\\mu}[\\phi^{2}]\\log(\\mathbb{E}_{\\mu}[\\phi^{2}])\\leq\\frac{2}{\\alpha}\\mathbb{E}_{\\mu}[\\|\\nabla\\phi\\|_{2}^{2}].\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array}{r}{\\int\\log(\\mathrm{d}\\dot{\\nu^{\\prime}}/\\mathrm{d}\\mu)\\mathrm{d}\\nu\\leq\\frac{2}{\\alpha}\\int\\|\\nabla\\log(\\mathrm{d}\\nu/\\mathrm{d}\\mu)\\|^{2}\\mathrm{d}\\mu.}\\end{array}$ This is equivalent to the condition that the KL divergence from Rfor any $\\nu\\in\\mathcal P$ $\\mu$ which is absolutely continuous with is bounded by the Fisher divergence: respect to µ. The LSI of proximal Gibbs measure can be established via standard perturbation criteria. For $L(\\mu)$ with bounded first-variation, we may apply the classical Bakry-Emery and Holley-Stroock arguments ( Bakry and Émery ,1985 ;Holley and Stroock ,1987 ) (Corollary 5.7.2 and 5.1.7 of Bakry et al. (2014 )): If $\\begin{array}{r}{\\|\\frac{\\delta L(\\mu)}{\\delta\\mu}\\|_{\\infty}\\le B}\\end{array}$ is satisfied for any $\\mu\\in\\mathcal Ḋ P Ḍ _{2}$ , then $\\mu^{*}$ and $p_{\\mathcal{X}}$ satisfy the LSI with ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\alpha\\geq\\lambda_{1}\\exp\\left({-4B/\\lambda}\\right).\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "With the LSI condition on the proximal Gibbs distribution, it is known that the MFLD converges to the optimal solution in an exponential order by using a so-called Entropy sandwich technique. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Proposition 2 (Entropy sandwich ( Nitanda et al. ,2022 ;Chizat ,2022 )) .Suppose that $\\mu_{0}$ satisfies $\\mathcal{L}(\\mu_{0})\\mathrm{~<~}\\infty$ and roximal Gibbs me ure $p_{\\mu_{t}}$ corresponding to the solution $\\mu_{t}$ has the $L S I$ constant αfor all $t\\geq0$ ≥, then the solution $\\mu_{t}$ of MFLD satisfies ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\lambda\\mathrm{KL}(\\mu^{*},\\mu_{t})\\leq\\mathcal{L}(\\mu_{t})-\\mathcal{L}(\\mu^{*})\\leq\\exp(-2\\alpha\\lambda t)(\\mathcal{L}(\\mu_{0})-\\mathcal{L}(\\mu^{*})),\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\mu^{*}=\\operatorname{argmin}_{\\mu\\in{\\mathcal{P}}}{\\mathcal{L}}(\\mu)$ (the existence and uniqueness of $\\mu^{*}$ is guaranteed by Proposition 1 ). ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Hence we know that time horizon $\\begin{array}{r}{T=O(\\frac{1}{\\lambda\\alpha}\\log(1/\\tilde{\\epsilon}))}\\end{array}$ is sufficient to achieve $\\tilde{\\epsilon}>0$ accuracy. ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Convergence of the discretized algorithm. While Proposition 2 only established the convergence rate of the continuous dynamics, similar guarantee can be shown for the discretized setting. Let ",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\textstyle\\mathcal{L}^{N}(\\mu^{(N)})=N\\mathbb{E}_{\\mathcal{X}\\sim\\mu^{(N)}}[F(\\mu_{\\mathcal{X}})]+\\lambda\\mathrm{Ent}(\\mu^{(N)}),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "where $\\mu^{(N)}$ is a distribution of $N$ particles $\\mathcal{X}=(X^{i})_{i=1}^{N}\\subset\\mathbb{R}^{\\bar{d}}$ ⊂. Let $\\mu_{\\tau}^{(N)}$ be the distribution of the particles and $\\eta\\,\\leq\\,1/4$ $\\mathcal{X}_{\\tau}=(X_{\\tau}^{i})_{i=1}^{N}$ , then for $\\begin{array}{r}{\\bar{B}^{2}\\,:=\\,\\mathbb{E}[\\|X_{0}^{i}\\|^{2}]+\\frac{1}{\\lambda\\lambda_{1}}\\Big[\\Big(\\frac{1}{4}+\\frac{1}{\\lambda\\lambda_{1}}\\Big)\\,\\bar{R}^{2}\\!+\\!\\lambda d\\Big]\\,=\\,O(d+\\lambda^{-2})}\\end{array}$ at the $\\tau$ -th iteration. h\u0010 Suzuki et al. (2023b i ) showed that, if $\\lambda\\alpha\\eta\\leq1/4$ and $\\delta_{\\eta}\\,:=$ $C_{1}\\bar{L}^{2}(\\eta^{2}+\\lambda\\eta)$ ,where $\\bar{L}=2\\bar{R}+\\lambda\\lambda_{1}={\\cal O}(1)$ and $C_{1}=\\mathring{\\mathrm{g}}(\\bar{R}^{2}+\\lambda\\mathring{\\lambda_{1}}\\bar{B}^{2}+d)=O(d+\\lambda^{-1})$ ,$\\frac{1}{N}\\mathbb{E}[\\mathcal{L}^{N}(\\mu_{\\tau}^{(N)})]-\\mathcal{L}(\\mu^{*})\\!\\leq\\!\\exp\\left(-\\frac{\\lambda\\alpha\\eta\\tau}{2}\\right)\\left(\\frac{\\mathbb{E}[\\mathcal{L}^{N}(\\mu_{0}^{(N)})]}{N}\\!-\\!\\mathcal{L}(\\mu^{*})\\right)\\!+\\!\\frac{4}{\\lambda\\alpha}\\bar{L}^{2}C_{1}\\big(\\lambda\\eta+\\eta^{2}\\big)+\\frac{4C_{\\lambda}}{\\lambda\\alpha N},$ where be bounded by $C_{\\lambda}$ is a constant depending on $\\begin{array}{r}{\\tilde{\\epsilon}+\\frac{4C_{\\lambda}}{\\lambda\\alpha N}}\\end{array}$ after $\\begin{array}{r}{T\\,=\\,O\\left(\\frac{\\bar{L}^{2}C_{1}}{\\alpha\\tilde{\\epsilon}}+\\frac{\\bar{L}\\sqrt{C_{1}}}{\\sqrt{\\lambda\\alpha\\tilde{\\epsilon}}}\\right)\\frac{1}{\\lambda\\alpha}\\log(1/\\tilde{\\epsilon})}\\end{array}$ $\\lambda$ \u0010. In particular, for a given \u0011$\\tilde{\\epsilon}>0$ iterations with the step size , the right hand side can $\\begin{array}{r}{\\eta={\\cal O}\\big(\\big(\\frac{\\bar{L}^{2}C_{1}}{\\alpha\\tilde{\\epsilon}}+\\frac{\\bar{L}\\sqrt{C_{1}}}{\\sqrt{\\lambda\\alpha\\tilde{\\epsilon}}}\\big)^{-1}\\big)}\\end{array}$ \u0000\u0000 \u0001\u0001. Furthermore, the convergence of the loss function can be connected to the convergence of the function value of the neural network as follows, ",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 4
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathfrak{L}_{\\mathcal{X}_{\\tau}\\sim\\mu_{k}^{(N)}}\\left[\\underset{z\\in\\mathrm{supp}(P_{Z})}{\\operatorname*{sup}}\\left(f_{\\mu_{\\mathcal{X}_{\\tau}}}(z)-f_{\\mu^{*}}(z))^{2}\\right]}\\\\ &{\\leq\\frac{4\\bar{L}^{2}}{\\lambda\\alpha}\\left(\\frac{\\mathcal{L}^{N}(\\mu_{\\tau}^{(N)})}{N}-\\mathcal{L}(\\mu^{*})\\right)+2\\mathbb{E}_{\\mathcal{X}_{\\tau}\\sim(\\mu^{*})^{\\otimes N}}\\Bigg[\\underset{z\\in\\mathrm{supp}(P_{Z})}{\\operatorname*{sup}}\\left(\\frac{1}{N}\\sum_{i=1}^{N}h_{X_{\\tau}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right)^{2}\\Bigg].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Here the second term in the right hand side can be bounded by $\\begin{array}{r}{\\frac{32\\bar{R}^{2}}{N}\\left[1+2\\left(\\frac{2\\bar{R}^{2}}{(\\lambda\\lambda_{1})^{2}}+\\frac{\\bar{d}}{\\lambda_{1}}\\right)\\right]}\\end{array}$ h\u0010\u0011i via Lemma number of particles as 2 , if $\\|z\\|\\leq1$ f$N=\\epsilon^{-2}[(\\lambda\\alpha)^{-2}+(\\lambda\\lambda_{1})^{-2}+d/\\lambda_{1}]$ $z\\in\\mathrm{supp}(P_{Z})$ $k$ e parity prob and letting $\\tilde{\\epsilon}=\\lambda\\alpha\\epsilon^{2}$ ce, by taking the with the choice of $T$ and $\\eta$ as described above, we have $\\mathrm{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\,|\\dot{f}_{\\mu\\mathcal{X}_{T}}(z)-f_{\\mu^{*}}(z)|=O_{p}(\\epsilon)$ .",
+        "page_idx": 4
+    },
+    {
+        "type": "text",
+        "text": "Assumptions on the model specification. We restrict ourselves to the situation where a perfect classifier with margin $c_{0}$ is included in our model class, stated in the following assumption. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Assumption 2. There exists $c_{0}>0$ and $R>0$ such that the following conditions are satisfied: ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "•For some $\\bar{R},$ , there exists $\\mu^{*}\\in\\mathcal{P}$ such that $\\mathrm{KL}(\\nu,\\mu^{*})\\leq R$ and $L(\\mu^{*})\\leq\\ell(0)-c_{0}$ .•For any $\\lambda<c_{0}/R,$ , the regularized expected risk minimizer $\\mu_{[\\lambda]}:=\\operatorname{argmin}L(\\mu)+\\lambda\\mathrm{KL}(\\nu,\\mu)$ satisfies $Y f_{\\mu_{[\\lambda]}}(X)\\geq c_{0}$ almost surely. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Importantly, we can apply the same general analysis for different classification problems, as long as Assumption 2 is verified. The advantage of this generality is that we do not need to tailor our convergence proof for individual learning problems. Note that the convergence rate of MFLD is strongly affected by the values of $\\bar{R}$ and $R$ ; therefore, it is crucial to establish this condition using the smallest possible values of $\\bar{R}$ and $R$ , in order to obtain a tight bound of the classification error. As an illustrative example, we now show that the $k$ -sparse parity estimation satisfies the above assumption. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Example: $k$ -sparse parity estimation. In the $k$ -sparse parity setting (Example 1 ), Assumption 2 is satisfied with constants specified in the following propositions. The proofs are given in Appendix A .Proposition 3 ($k$ -sparse parity) .Under Assumption $^{\\,l}$ and for ${\\bar{R}}=k$ , there exists $\\mu^{*}\\in\\mathcal{P}$ such that ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathrm{KL}(\\nu,\\mu^{*})\\leq c_{1}k\\log(k)^{2}d\\;(=R),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "and $L(\\mu^{*})\\leq\\ell(0)-c_{2}$ , where $c_{1},c_{2}>0$ are absolute constants. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Proposition 4. Under Assumption $^{\\,l}$ and the settings of $R$ and $\\bar{R}$ given in Proposition 3 , if $\\lambda<$ $c_{2}/(2R)$ , then $\\mu_{[\\lambda]}$ satisfies ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\operatorname*{max}\\{\\bar{L}(\\mu_{[\\lambda]}),L(\\mu_{[\\lambda]})\\}\\le\\ell(0)-c_{2}+\\lambda R<\\ell(0)-\\frac{c_{2}}{2},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "and $f_{\\mu_{[\\lambda]}}$ is a perfect classifier with margin $c_{2}$ , i.e., $\\begin{array}{r}{Y f_{\\mu_{[\\lambda]}}(X)\\ge\\frac{c_{2}}{2}}\\end{array}$ .",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "In other words, Assumption 2 is achieved with $R=O(k\\log(k)^{2}d)$ ,${\\bar{R}}=k$ and $c_{0}\\,=\\,c_{2}/2$ . By substituting these values of $R$ and $\\bar{R}$ to our general results presented below, we can easily derive a bound for the classification error of the MFLD estimator. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4 Main Result: Annealing Procedure and Classification Error Bound ",
+        "text_level": 1,
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "4.1 Annealing Procedure ",
+        "text_level": 1,
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "The convergence rate of MFLD is heavily dependent on the LSI constant which may impose a large computational cost. We alleviate this dependency by employing a novel annealing scheme where we gradually decrease the regularization parameter $\\lambda$ . In particular, at the $\\kappa$ -th round, we run the MFLD until (near) convergence with a regularization parameter $\\lambda^{(\\kappa)}=2^{-\\kappa}\\lambda^{(0)}$ :$\\mu_{0}=\\mu^{(\\kappa-1)}$ ,",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathrm{d}X_{t}=-\\left[\\nabla\\frac{\\delta L(\\mu_{t})}{\\delta\\mu}(X_{t})\\mathrm{d}t+2\\lambda^{(\\kappa)}\\lambda_{1}X_{t}\\right]+\\sqrt{2\\lambda^{(\\kappa)}}\\mathrm{d}W_{t},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "which co ponds to minimizing $\\mathcal{L}^{(\\kappa)}(\\mu):=L(\\mu)+\\lambda^{(\\kappa)}\\mathrm{KL}(\\nu,\\mu)$ . Then, we obtain a near optimal solut $\\mu^{(\\kappa)}$ as $\\begin{array}{r}{\\mathcal L^{(\\kappa)}(\\mu^{(\\kappa)})\\leq\\operatorname*{min}_{\\mu\\in\\mathcal P}\\mathcal L^{(\\kappa)}(\\mu)+\\epsilon^{*}}\\end{array}$ for a given $\\epsilon^{*}>0$ . We terminate the procedure after $K$ rounds and obtain $\\mu^{(K)}$ as the output. ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Sup t there exists $\\mu^{*}$ such that $\\mathrm{KL}(\\nu,\\mu^{*})\\leq R$ and $L(\\mu^{*})\\leq\\delta^{*}$ . Then, as long as $\\lambda^{(\\kappa)}\\geq\\delta^{*}$ and $\\epsilon^{*}<\\delta^{*}$ , we have that ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\nL(\\mu^{(\\kappa)})+\\lambda^{(\\kappa)}\\mathrm{KL}(\\nu,\\mu^{(\\kappa)})\\leq L(\\mu^{*})+\\lambda^{(\\kappa)}\\mathrm{KL}(\\nu,\\mu^{*})+\\epsilon^{*}\\leq2\\delta^{*}+\\lambda^{(\\kappa)}R\\leq(R+2)\\lambda^{(\\kappa)}.\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "$\\mathcal{L}^{(\\kappa)}(\\mu_{t})$ the optimization, we always have $L(\\mu_{t})\\,\\leq$ $\\mathcal{L}^{(\\kappa)}(\\mu^{(\\kappa-1)})\\,\\leq\\,\\mathcal{L}^{(\\kappa-1)}(\\mu^{(\\kappa-1)})\\,\\leq\\,(R+2)\\lambda^{(\\kappa-1)}$ Lcommon classification losses to ensure that ≤L ≤∥$\\|\\delta L(\\mu)/\\delta\\mu\\|_{\\infty}$ ∥∞w we utilize the follo is small when the loss $L(\\mu)$ is small. structure on ",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Assumption 3. There exists $c_{\\mathrm{{L}}}>0$ , such that, for any $\\mu\\in\\mathcal P$ , it holds that $\\begin{array}{r}{\\|\\frac{\\delta L(\\mu)}{\\delta\\mu}\\|_{\\infty}\\leq c_{\\mathrm{L}}\\bar{R}L(\\mu)}\\end{array}$ .For example, the logistic loss satisfies this assumption: ",
+        "page_idx": 5
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{|\\partial_{u}\\log(1+\\exp(-u))|=\\frac{\\exp(-u)}{1+\\exp(-u)}\\leq\\log(1+\\exp(-u)).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 5
+    },
+    {
+        "type": "text",
+        "text": "Hence, the condition holds for $c_{\\mathrm{L}}=1$ because ∥$\\begin{array}{r}{\\|\\frac{\\delta L(\\mu)}{\\delta\\mu}\\|_{\\infty}\\leq\\frac{1}{n}\\sum_{i=1}^{n}|\\ell^{\\prime}(y_{i},f_{\\mu}(z_{i}))|\\|h_{z_{i}}(\\cdot)\\|_{\\infty}\\leq}\\end{array}$ P$\\begin{array}{r}{\\frac{1}{n}\\sum_{i=1}^{n}{\\bar{R}}\\ell(y_{i},f_{\\mu}(z_{i}))={\\bar{R}}L(\\mu)}\\end{array}$ P. Under this assumption, the Holley–Strook argument yields that the log-Sobolev constant during the optimization can be bounded as ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\alpha\\geq\\lambda_{1}\\exp\\left(-\\frac{4c_{\\mathrm{L}}\\bar{R}(R+2)\\lambda^{(\\kappa-1)}}{\\lambda^{(\\kappa)}}\\right)\\geq\\lambda_{1}\\exp\\left(-8c_{\\mathrm{L}}\\bar{R}(R+2)\\right),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "which is independent of $\\lambda^{(\\kappa)}$ and the final accuracy $\\delta^{*}$ . Hence, after $K\\;=\\;\\log_{2}(R/(\\lambda^{(0)}\\epsilon^{*}))$ round, we achieve that $L(\\boldsymbol{\\mu}^{(K)})\\,\\leq\\,\\delta^{*}+2\\epsilon^{*}$ where each round takes $T_{\\kappa}\\,=\\,\\log(1/\\epsilon^{*})/(2\\alpha\\lambda)\\,=$ $O(\\log(1/\\epsilon^{*})\\exp(8c_{\\mathrm{L}}\\bar{R}(R+2))/(\\lambda_{1}\\lambda^{(k)}))$ for the continuous time setting. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "For the discrete setting, $\\begin{array}{r}{T_{\\kappa}\\ =\\ O\\left(\\left(\\frac{C_{1}}{\\alpha\\epsilon^{*}}+\\frac{\\sqrt{C_{1}}}{\\sqrt{\\lambda^{(\\kappa)}\\alpha\\epsilon^{*}}}\\right)\\log(1/\\epsilon^{*})\\exp(8c_{\\mathrm{L}}\\bar{R}(R+2))/(\\lambda_{1}\\lambda^{(\\kappa)})\\right)}\\end{array}$ \u0010\u0010 \u0011\u0011$\\eta\\;=\\;O\\left(C_{1}^{-1}\\alpha\\epsilon^{*}\\wedge C_{1}^{-1/2}\\sqrt{\\lambda^{(\\kappa)}\\alpha\\epsilon^{*}}\\right)$ iterations in each round is sufficient (where \u0010. As long as $C_{1}$ is given for $\\epsilon^{*}\\;=\\;O(\\lambda^{(\\kappa)}/\\alpha)$ $\\lambda^{(K)}$ ), where the step size is for all $\\kappa$ , the total iteration number can be simplified as $O\\left(\\log(1/\\epsilon^{*})\\exp(16c_{\\mathrm{L}}\\bar{R}(R+2))C_{1}/(\\lambda^{(K)}\\epsilon^{*})\\right)$ \u0000, and the width ${\\cal O}\\left([\\exp(16c_{\\mathrm{L}}\\bar{R}(R+2))/(\\lambda^{(K)})^{2}+d]/(\\epsilon^{*})^{2}\\right)$ $N$ (number of particles) can be taken as \u0000$N\\ =\\ O([(\\lambda^{(K)}\\alpha)^{-2}\\,+\\,(\\lambda^{(K)})^{-2}\\,+\\,d]/(\\epsilon^{*})^{2})\\ =$ \u0001.",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "Remark 1. We make the following remarks on the annealing procedure. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "•The main advantage of this annealing approach is that the exponential factor induced by the LSI constant $\\alpha$ is not dependent on the choice of the regularization parameter ${\\lambda}^{(k)}$ (note that the LSI is solely determined by the intermediate solution $\\mu_{t}$ ). In contrast, the naive Holley–Stroock argument of Eq. (5 )imposes exponential dependency on the regularization parameter. •Our annealed algorithm differs from the procedure considered in Chizat (2022 , Section 4); importantly, we make use of the structure of classification loss functions to obtain a refined computational complexity analysis. ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "4.2 Generalization Error Analysis ",
+        "text_level": 1,
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "We utilize the local Rademacher complexity (Mendelson ,2002 ;Bartlett et al. ,2005 ;Koltchinskii ,2006 ;Giné and Koltchinskii ,2006 ) to obtain a faster generalization error rate. For the function class of me ${\\mathcal{F}}:=\\{f_{\\mu}\\ |\\ \\mu\\in{\\mathcal{P}}\\}$ e KL-constrained model class F${\\mathcal{F}}_{M}({\\boldsymbol{\\mu}}^{\\circ}):=\\{f_{\\boldsymbol{\\mu}}\\mid{\\boldsymbol{\\mu}}\\in{\\mathcal{P}}$ {|∈P ,$\\operatorname{KL}(\\mu^{\\circ},\\mu)\\leq M\\}$ ≤}for $\\mu^{\\circ}\\in\\mathcal{P}$ ∈P and $M>0$ . The Rademacher complexity of a function class $\\tilde{\\mathcal F}$ Fis defined as ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathrm{Rad}(\\tilde{\\mathcal{F}}):=\\mathbb{E}_{\\varepsilon_{i},z_{i}}\\left[\\operatorname*{sup}_{f\\in\\tilde{\\mathcal{F}}}\\frac{1}{n}\\sum_{i=1}^{n}\\epsilon_{i}f(z_{i})\\right],}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "where $(z_{i})_{i=1}^{n}$ are i.i.d. observations from $P_{Z}$ and $(\\varepsilon_{i})_{i=1}^{n}$ is an i.i.d. Rademacher sequence ( $P(\\varepsilon_{i}=$ $1)=P(\\varepsilon_{i}=-1)=1/2)$ ). We have the following bound on the Rademacher complexity of the function class F$\\mathcal{F}_{M}(\\mu^{\\circ})$ .",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "$\\mu^{\\circ}\\in\\mathcal P$ Lemma 1 and (Local Rademacher complexity of $M>0;$ , it holds that $\\begin{array}{r}{\\operatorname{Rad}(\\mathcal{F}_{M}(\\mu^{\\circ}))\\leq2\\bar{R}\\sqrt{\\frac{M}{n}}}\\end{array}$ $\\mathcal{F}_{M}(\\mu^{\\circ})$ ,qChen et al. .(2020 ) adapted) .For any fixed ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "The proof is given in Appendix B.2 in the supplementary material. Combining this local Rademacher complexity bound with the peeling device argument ( van de Geer ,2000 ), we can roughly obtain the following estaimte (note that this is an informal derivation): ",
+        "page_idx": 6
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\underbrace{\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}}_{(\\mathrm{II})}+\\underbrace{\\lambda\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}_{(\\mathrm{I})}\\lesssim\\sqrt{\\frac{\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}{n}}\\lesssim\\frac{1}{n\\lambda}+\\lambda\\mathrm{KL}(\\mu^{*},\\hat{\\mu}),\n$$",
+        "text_format": "latex",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "ith high probability, where ${\\hat{\\mu}}=\\operatorname{argmin}_{\\mu\\in{\\mathcal{P}}}{\\mathcal{L}}(\\mu)$ ,$\\mu^{*}=\\operatorname*{argmin}_{\\mu\\in\\mathcal{P}}\\bar{L}(\\mu)+\\lambda\\mathrm{KL}(\\nu,\\mu)$ ,$R$ and $\\bar{R}$ are regarded as constants, and the last inequality is by the AM-GM relation. Observe that on the left hand side, we have two non-negative terms (I) and (II). Corresponding to each term, we obtain different types of classification error bounds (Type I and Type $\\mathrm{II}$ in the following subsection, respectively). Note that there appears a $O(1/n)$ factor in the right hand side, which cannot be ",
+        "page_idx": 6
+    },
+    {
+        "type": "text",
+        "text": "obtained by a vanilla Rademacher complexity evaluation because it only yields an $O(1/{\\sqrt{n}})$ bound.   \nIn other words, localization is essential to obtain our fast convergence rate. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "We remark that a local Rademacher complexity technique is also utilized by Telgarsky (2023 ) to derive a ${\\cal O}(1/n)$ rate. They adapted a technique developed for a smooth loss function by Srebro et al. (2010 ), which requires the training loss $\\bar{L}(\\hat{\\mu})$ to be sufficiently small, that is, of order $L(\\hat{\\mu})=$ $O(1/n)$ . In our setting, to achieve such a small training loss, we need to take large $\\bar{R}$ such as $\\bar{R}=\\Omega(\\log(n))$ . Unfortunately, such a large $\\bar{R}$ induces exponentially small log-Sobolev constant like $\\alpha\\lesssim\\exp(-c d\\log(n))=n^{-c d}$ . In contrast, our analysis focuses on the local Rademacher complexity around $\\mu^{*}$ , and hence we do not require the training loss to be close to 0; instead, it suffices to have a training loss that is close to or smaller than that of $\\mu^{*}$ .",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.2.1 Type I: Perfect Classification with Exponentially Decaying Error ",
+        "text_level": 1,
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "In the regime of $n=\\Omega(1/\\lambda^{(K)2})$ , we can prove that the MFLD estimator attains a perfect classification with an exponentially converging probability by evaluating the term (I). From Eq. (7 )we establish $\\mathrm{KL}(\\mu^{*},\\hat{\\mu})\\leq O_{p}(1/(n\\lambda^{(K)2}))$ ; this KL divergence bound can be used to control the $L^{\\infty}$ proof of Theorem -norm between 1 $f_{\\hat{\\mu}}$ ). Then, under the margin assumption of and $f_{\\mu^{*}}$ . Indeed, we can show that $\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}^{2}\\leq2\\bar{R}^{2}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})$ $f_{\\mu^{*}}$ (Assumption ∞≤2 ), we have that (see t $f_{\\hat{\\mu}}$ also yields a Bayes optimal classifier. More precisely, we have the following theorem. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Theorem 1. Suppose Assumptions $^{\\,l}$ and 2 hold. Let $M_{0}\\,=\\,(\\epsilon^{*}+2(\\bar{R}+1))/\\lambda^{(K)}$ . Moreover, ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "suppose that $\\lambda^{(K)}<c_{0}/R$ and   \n$Q:=c_{0}^{2}-\\frac{4\\bar{R}^{2}}{n\\lambda^{(K)2}}\\left[\\lambda^{(K)}\\left(4\\bar{R}+\\frac{\\lambda^{(K)}}{32\\bar{R}^{2}n}\\right)+8\\bar{R}^{2}(4+\\log\\log_{2}(8n^{2}M_{0}\\bar{R}))+n\\lambda^{(K)}\\epsilon^{*}\\right]>0,$ then $f_{\\hat{\\mu}}$ yields perfect classification, i.e., $P\\left(Y f_{\\hat{\\mu}}(Z)>0\\right)=1$ , with probability $1-\\exp(-\\frac{n\\lambda^{(K)2}}{32\\bar{R}^{4}}Q)$ .The proof is given in Appendix C.1 in the supplementary material. From Proposition 3 we see that the requirement $n\\asymp1/\\lambda^{(K)2}$ implies that in the $n\\asymp d^{2}$ regime, Theorem 1 gives a perfect classification guarantee with a failure probability decaying exponentially fast. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.2.2 Type II: Polynomial Order Classification Error ",
+        "text_level": 1,
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Next we evaluate the classification error bound from term (II) in Eq. (7 ). In this case, we do not require an $L^{\\infty}$ -norm bound as in the Type I analysis above; this results in a milder dependency on $\\lambda^{(\\bar{K})}$ and hence a better sample complexity. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Theorem 2. Suppose Assumptions $^{\\,l}$ and 2 hold. Let $\\lambda^{(K)}<c_{0}/R$ and $M_{0}=\\big(\\epsilon^{*}+2(\\bar{R}\\!+\\!1)\\big)/\\lambda^{(K)}$ .Then, with probability $1-\\exp(-t)$ , the classification error of $f_{\\mu^{(K)}}$ is bounded as ",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\n^{\\circ}(Y f_{\\mu^{(K)}}(Z)\\leq0)\\leq2\\psi(c_{0})\\left[\\frac{8\\bar{R}^{2}}{n\\lambda^{(K)}}\\left(4+t+\\log\\log_{2}(8n^{2}M_{0}\\bar{R})\\right)+\\frac{1}{n}\\left(4\\bar{R}+\\frac{\\lambda^{(K)}}{32\\bar{R}^{2}n}\\right)+\\epsilon^{*}\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "The proof is given in Appendix C.2 in the supplementary material. We notice that the right hand side scales with $O(1/(n\\lambda^{(K)}))$ , which is better than ${\\cal O}(1/(n\\lambda^{(K)2}))$ in Theorem 1 ; this implies that a sample size linear in the dimensionality is sufficient to achieve small classification error. The reason for such improvement in the $\\lambda^{K}$ -dependence is that the stronger $L^{\\infty}$ -norm convergence is not used in the proof; instead, only the convergence of the loss is utilized. On the other hand, this analysis does not guarantee a perfect classification. ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "4.2.3 Computational Complexity of MFLD ",
+        "text_level": 1,
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "From the general result in Section 4.1 , we can evaluate the computational complexity to achieve the statistical bounds derived above. In both cases (Theorems 1 and 2 ), we may set the optimization error $\\epsilon^{*}=O(1/(n\\lambda^{(K)}))$ . Then, the total number of iteration can be ",
+        "page_idx": 7
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sum_{\\kappa=1}^{K}T_{\\kappa}\\leq O\\left((d+\\lambda^{(K)-1})n\\exp(16c_{\\mathrm{L}}\\bar{R}(R+2))\\log(n\\lambda^{(K)})\\right).\n$$",
+        "text_format": "latex",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "$O\\left(n^{2}\\exp(16c_{\\mathrm{L}}\\bar{R}(R+2))\\right)$ The width \u0000$N$ (the number of particles) can be taken as \u0001.${\\cal N}={\\cal O}((\\epsilon^{*}\\lambda^{(K)}\\alpha)^{-2})={\\cal O}(n^{2}\\alpha^{-2})=$ ",
+        "page_idx": 7
+    },
+    {
+        "type": "text",
+        "text": "Corollary 1 ($k$ -sparse parity setting) .In the $k$ -sparse parity setting, we may take $R=O(k\\log(k)^{2}d)$ ,$\\bar{R}=k$ and $\\lambda^{(K)}=O(1/R)=O(1/(k\\log(k)^{2}d))$ . Therefore, the classification error is bounded by ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP(Y f_{\\mu^{(K)}}<0)\\leq O\\left(\\frac{k^{2}\\log(k)^{2}d}{n}(\\log(1/\\delta)+\\log\\log(n))\\right),\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\delta$ . Moreover, $i f n=\\Omega(k^{6}\\log(k)^{4}d^{2})$ , then $P(Y f_{\\mu^{(K)}}>0)=1$ with probability ",
+        "page_idx": 8
+    },
+    {
+        "type": "equation",
+        "text": "$$\n1-\\exp(-\\Omega(n k^{6}\\log(k)^{4}/d^{2})).\n$$",
+        "text_format": "latex",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "As for the computational complexity, we require $O(k\\log(k)^{2}d n\\log(n d)\\exp[O(k^{2}\\log(k)^{2}d)])$ iterations, and the number of particles is $O(\\exp(O(k^{2}\\log(k)^{2}d)))$ ).",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Comparison with prior results. In the 2-sparse parity setting, neural network in the kernel (NTK) regime achieves only $O(d^{2}/n)$ convergence in the classification error, as shown in Ji and Telgarsky (2019 ) and Telgarsky (2023 , Theorem 2.3), whereas we demonstrate that mean-field neural network can improve the rate to $O(d/n)$ via feature learning. Telgarsky (2023 ) also analyzed the learning of 2-sparse parity problem beyond the kernel regime, and showed that 2-layer ReLU neural network can achieve the best known classification error $O(d/n)$ . However, their analysis considered a low-rotation dynamics and assumed convergence at $t\\to\\infty$ , whereas our framework also provides a concrete estimate of the computational complexity. Indeed, the number of iterations can be bounded as $O(d n\\log(n d)\\exp[O(d)])$ . In addition, while we still require exponential width $N=O(n^{2}\\exp(O(d)))$ , such a condition is an improvement over $N=O(d^{d})$ in Telgarsky (2023 ). ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Barak et al. (2022 ) considered a learning method in which one-step gradient descent is performed for the purpose of feature learning, and then a network with randomly re-initialized bias units is used to fit the data. For the $k$ -sparse parity problem, they derived a classification error bound of $O(d^{(k+1)/2}/\\sqrt{n})$ .In contrast, our analysis yields a much better statistical complexity of $O(k^{2}\\log(k)^{2}d/\\dot{n}\\wedge\\exp(-\\Omega(n k^{6}\\log(k)^{4}/d^{2}))$ ), which “decouples” the degree $k$ in the exponent of the dimension dependence. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "5 Numerical Experiment ",
+        "text_level": 1,
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "We validate our theoretical results by numerical experiment on synthetic data. Specifically, we consider the classification of 2 -sparse parity with varying dimensionality $d$ and sample size $n$ .",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Recall that the samples $\\{(z_{i},y_{i})\\}_{i=1}^{n}$ are independently generated so that $z_{i}$ follows the uniform distribution on $\\{\\pm1/\\sqrt{d}\\}^{d}$ and $y_{i}\\;=\\;d\\zeta_{i,1}\\zeta_{i,2}\\;\\in\\;\\{\\pm1\\}$ $(z_{i}~=~(\\zeta_{i,1},\\ldots,\\zeta_{i,d}))$ . A finiteapproximation of the mean-field neural network $\\begin{array}{r}{\\frac{1}{N}\\sum_{j=1}^{N}h_{x_{j}}(z)}\\end{array}$ Pis employed with the width $N=$ 2 ,000 . For each neuron of the network, all parameters are initialized to independently follow the standard normal distribution (meaning that the network is rotation invariant at initialization) and the scaling parameter $\\bar{R}$ is set to 15 . We set $d$ to take values $5,10,\\cdot\\cdot\\cdot\\,,150$ $n=50,100,\\cdot\\cdot\\cdot\\cdot,2000$ .We trained the network using noisy gradient descent with $\\eta=0.2$ ,$\\lambda_{1}=0.1$ , and $\\lambda=0.1/d$ (fixed during the whole training) until $T=10,000$ . The logistic loss is used for the training objective. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "Figure 1 shows the average test accuracy over five trials. We make the following observations. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "•The red line corresponds to the sample size $\\begin{array}{r l r}{n}&{{}\\!\\!\\!\\!=}&{\\!\\!\\!\\!\\Theta(d^{2})}\\end{array}$ , above which we observe that almost-perfect classification is achieved. According to Section 4.2 (Type I), the classification error gets exponentially small with respect to $n/d^{\\breve{2}}$ , which predicts very small classification error above the line of $\\begin{array}{r}{\\hat{n}=\\Theta(d^{2})}\\end{array}$ ,which matches our experimental result. ",
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "•The boundary of test accuracy above $50\\%$ is almost linear, as indicated by the blue line. This matches the theoretical conditions (Type II) to obtain the polynomial order classification error in Section 4.2 .",
+        "page_idx": 8
+    },
+    {
+        "type": "image",
+        "img_path": "images/15610757c915f124d56f23638545c4be53e9f8c2c1cfbfdd435bfb03bc81c1da.jpg",
+        "img_caption": [
+            "Figure 1: Test accuracy of two-layer neural network optimized by the MFLD to learn a $d\\!.$ -dimensional 2-sparse parity (XOR) problem. "
+        ],
+        "img_footnote": [],
+        "page_idx": 8
+    },
+    {
+        "type": "text",
+        "text": "6 Conclusion and Discussion ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "We provided a general framework to evaluate the classification error of a two-layer neural network trained by the mean-field Langevin dynamics. Thanks to the generality of our framework, an error bound for specific settings can be derived by directly specifying the parameters in Assumption 2 such as $R,\\bar{R}$ , and $c_{0}$ . We also proposed an annealing procedure to alleviate the exponential dependencies in the LSI constant. As a special (but important) example, we investigated the $k$ -sparse parity problem, for which we obtained more general and better sample complexity than existing works. ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "A limitation of our approach is that the required width and number of iterations are exponential with respect to the dimensionality $d$ ; in contrast, certain tailored algorithms for learning low-dimensional target functions such as Abbe et al. (2023 ); Chen and Meka (2020 ) do not require such exponential computation. An important open problem is whether we can reduce the width and number of iterations to $\\mathrm{poly}(d)$ for the vanilla noisy gradient descent algorithm. Another interesting direction is to investigate the interplay between structured data and the efficiency of feature learning, as done in Ghorbani et al. (2020 ); Refinetti et al. (2021 ); Ba et al. (2023 ); Mousavi-Hosseini et al. (2023 ). ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "Acknowledgements ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "The authors thank Matus Telgarsky for discussions and feedback. TS was partially supported by JSPS KAKENHI (20H00576) and JST CREST (JPMJCR2115, JPMJCR2015). KO was partially supported by JST, ACT-X Grant Number JPMJAX23C4, JAPAN. AN was partially supported by JSPS KAKENHI (22H03650). ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "References ",
+        "text_level": 1,
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "E. Abbe, E. B. Adsera, and T. Misiakiewicz. The merged-staircase property: a necessary and nearly sufficient condition for sgd learning of sparse functions on two-layer neural networks. In Conference on Learning Theory , pages 4782–4887. PMLR, 2022.   \nE. Abbe, E. Boix-Adsera, and T. Misiakiewicz. SGD learning on neural networks: leap complexity and saddle-to-saddle dynamics. arXiv preprint arXiv:2302.11055 , 2023.   \nJ. Ba, M. A. Erdogdu, T. Suzuki, Z. Wang, D. Wu, and G. Yang. High-dimensional asymptotics of feature learning: How one gradient step improves the representation. In A. H. Oh, A. Agarwal, D. Belgrave, and K. Cho, editors, Advances in Neural Information Processing Systems , 2022. URL https://openreview.net/forum?id $\\equiv$ akddwRG6EGi .  \nJ. Ba, M. A. Erdogdu, T. Suzuki, Z. Wang, and D. Wu. Learning in the presence of low-dimensional structure: a spiked random matrix perspective. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023.   \nD. Bakry and M. Émery. Diffusions hypercontractives. In J. Azéma and M. Yor, editors, Séminaire de Probabilités XIX 1983/84 , pages 177–206, Berlin, Heidelberg, 1985. Springer Berlin Heidelberg. ISBN 978-3-540-39397-9.   \nD. Bakry, I. Gentil, M. Ledoux, et al. Analysis and geometry of Markov diffusion operators , volume 103. Springer, 2014.   \nB. Barak, B. L. Edelman, S. Goel, S. M. Kakade, eran malach, and C. Zhang. Hidden progress in deep learning: SGD learns parities near the computational limit. In A. H. Oh, A. Agarwal, D. Belgrave, and K. Cho, editors, Advances in Neural Information Processing Systems , 2022. URL https://openreview.net/forum?id=8XWP2ewX-im .  \nP. Bartlett, O. Bousquet, and S. Mendelson. Local Rademacher complexities. The Annals of Statistics ,33:1487–1537, 2005.   \nP. L. Bartlett, M. I. Jordan, and J. D. McAuliffe. Convexity, classification, and risk bounds. Journal of the American Statistical Association , 101(473):138–156, 2006.   \nG. Ben Arous, R. Gheissari, and A. Jagannath. High-dimensional limit theorems for sgd: Effective dynamics and critical scaling. Advances in Neural Information Processing Systems , 35:25349– 25362, 2022.   \nS. Boucheron, G. Lugosi, and P. Massart. Concentration Inequalities: A Nonasymptotic Theory of Independence . OUP Oxford, 2013. ISBN 9780199535255. URL https://books.google.co. jp/books?id=koNqWRluhP0C .  \nF. Chen, Z. Ren, and S. Wang. Uniform-in-time propagation of chaos for mean field langevin dynamics. arXiv preprint arXiv:2212.03050 , 2022.   \nS. Chen and R. Meka. Learning polynomials in few relevant dimensions. In J. Abernethy and S. Agarwal, editors, Proceedings of Thirty Third Conference on Learning Theory , volume 125 of Proceedings of Machine Learning Research , pages 1161–1227. PMLR, 09–12 Jul 2020. URL https://proceedings.mlr.press/v125/chen20a.html .  \nZ. Chen, Y. Cao, Q. Gu, and T. Zhang. A generalized neural tangent kernel analysis for two-layer neural networks. In H. Larochelle, M. Ranzato, R. Hadsell, M. Balcan, and H. Lin, editors, Advances in Neural Information Processing Systems , volume 33, pages 13363–13373. Curran Associates, Inc., 2020. URL https://proceedings.neurips.cc/paper_files/paper/2020/ file/9afe487de556e59e6db6c862adfe25a4-Paper.pdf.  \nL. Chizat. Mean-field langevin dynamics : Exponential convergence and annealing. Transactions on Machine Learning Research , 2022. URL https://openreview.net/forum?id $\\equiv$ BDqzLH1gEm .  \nL. Chizat and F. Bach. On the global convergence of gradient descent for over-parameterized models using optimal transport. In Advances in Neural Information Processing Systems 31 , pages 3040–3050, 2018.   \nL. Chizat and F. Bach. Implicit bias of gradient descent for wide two-layer neural networks trained with the logistic loss. arXiv preprint arXiv:2002.04486 , 2020.   \nA. Damian, J. Lee, and M. Soltanolkotabi. Neural networks can learn representations with gradient descent. In P.-L. Loh and M. Raginsky, editors, Proceedings of Thirty Fifth Conference on Learning Theory , volume 178 of Proceedings of Machine Learning Research , pages 5413–5452. PMLR, 02–05 Jul 2022. URL https://proceedings.mlr.press/v178/damian22a.html .  \nA. Daniely and E. Malach. Learning parities with neural networks. arXiv preprint arXiv:2002.07400 ,2020.   \nM. D. Donsker and S. S. Varadhan. Asymptotic evaluation of certain markov process expectations for large time. IV. Communications on pure and applied mathematics , 36(2):183–212, 1983.   \nB. Ghorbani, S. Mei, T. Misiakiewicz, and A. Montanari. Linearized two-layers neural networks in high dimension. arXiv preprint arXiv:1904.12191 , 2019.   \nB. Ghorbani, S. Mei, T. Misiakiewicz, and A. Montanari. When do neural networks outperform kernel methods? arXiv preprint arXiv:2006.13409 , 2020.   \nE. Giné and V. Koltchinskii. Concentration inequalities and asymptotic results for ratio type empirical processes. The Annals of Probability , 34(3):1143–1216, 2006.   \nR. Holley and D. Stroock. Logarithmic sobolev inequalities and stochastic ising models. Journal of statistical physics , 46(5-6):1159–1194, 1987.   \nD. Hsu. Dimension lower bounds for linear approaches to function approximation.   \nK. Hu, Z. Ren, D. Siska, and L. Szpruch. Mean-field langevin dynamics and energy landscape of neural networks. arXiv preprint arXiv:1905.07769 , 2019.   \nX. Huang, P. Ren, and F.-Y. Wang. Distribution dependent stochastic differential equations. Frontiers of Mathematics in China , 16(2):257–301, 2021.   \nA. Jacot, F. Gabriel, and C. Hongler. Neural tangent kernel: Convergence and generalization in neural networks. In Advances in Neural Information Processing Systems 31 , pages 8580–8589, 2018.   \nZ. Ji and M. Telgarsky. Polylogarithmic width suffices for gradient descent to achieve arbitrarily small test error with shallow relu networks. arXiv preprint arXiv:1909.12292 , 2019.   \nV. Koltchinskii. Local Rademacher complexities and oracle inequalities in risk minimization. The Annals of Statistics , 34:2593–2656, 2006.   \nM. Ledoux and M. Talagrand. Probability in Banach Spaces. Isoperimetry and Processes . Springer, New York, 1991. MR1102015.   \nS. Mei, A. Montanari, and P.-M. Nguyen. A mean field view of the landscape of two-layer neural networks. Proceedings of the National Academy of Sciences , 115(33):E7665–E7671, 2018.   \nS. Mendelson. Improving the sample complexity using global data. IEEE Transactions on Information Theory , 48:1977–1991, 2002.   \nM. Mohri, A. Rostamizadeh, and A. Talwalkar. Foundations of Machine Learning . The MIT Press, 2012.   \nA. Mousavi-Hosseini, D. Wu, T. Suzuki, and M. A. Erdogdu. Gradient-based feature learning under structured data. In Thirty-seventh Conference on Neural Information Processing Systems (NeurIPS 2023) , 2023.   \nA. Nitanda and T. Suzuki. Stochastic particle gradient descent for infinite ensembles. arXiv preprint arXiv:1712.05438 , 2017.   \nA. Nitanda, D. Wu, and T. Suzuki. Convex analysis of the mean field langevin dynamics. In G. CampsValls, F. J. R. Ruiz, and I. Valera, editors, Proceedings of The 25th International Conference on Artificial Intelligence and Statistics , volume 151 of Proceedings of Machine Learning Research ,pages 9741–9757. PMLR, 28–30 Mar 2022.   \nM. Refinetti, S. Goldt, F. Krzakala, and L. Zdeborova. Classifying high-dimensional gaussian mixtures: Where kernel methods fail and neural networks succeed. In M. Meila and T. Zhang, editors, Proceedings of the 38th International Conference on Machine Learning , volume 139 of Proceedings of Machine Learning Research , pages 8936–8947. PMLR, 18–24 Jul 2021. URL https://proceedings.mlr.press/v139/refinetti21b.html .  \nG. M. Rotskoff and E. Vanden-Eijnden. Trainability and accuracy of neural networks: An interacting particle system approach. arXiv preprint arXiv:1805.00915 , 2018.   \nJ. Sirignano and K. Spiliopoulos. Mean field analysis of neural networks: A central limit theorem. Stochastic Processes and their Applications , 130(3):1820–1852, 2020.   \nN. Srebro, K. Sridharan, and A. Tewari. Smoothness, low noise and fast rates. In J. Lafferty, C. Williams, J. Shawe-Taylor, R. Zemel, and A. Culotta, editors, Advances in Neural Information Processing Systems ,volume 23. Curran Associates, Inc., 2010. URL https://proceedings.neurips.cc/paper_files/paper/2010/file/ 76cf99d3614e23eabab16fb27e944bf9-Paper.pdf .  \nT. Suzuki, A. Nitanda, and D. Wu. Uniform-in-time propagation of chaos for the mean field gradient langevin dynamics. In Submitted to The Eleventh International Conference on Learning Representations , 2023a. URL https://openreview.net/forum?id=_JScUk9TBUn .  \nT. Suzuki, D. Wu, and A. Nitanda. Convergence of mean-field langevin dynamics: Time-space discretization, stochastic gradient, and variance reduction. arXiv preprint , 2023b.   \nM. Telgarsky. Feature selection and low test error in shallow low-rotation ReLU networks. In The Eleventh International Conference on Learning Representations , 2023. URL https:// openreview.net/forum?id=swEskiem99 .  \nS. van de Geer. Empirical Processes in M-Estimation . Cambridge University Press, 2000.   \nC. Wei, J. D. Lee, Q. Liu, and T. Ma. Regularization matters: Generalization and optimization of neural nets vs their induced kernel. In Advances in Neural Information Processing Systems , pages 9712–9724, 2019. ",
+        "page_idx": 9
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 10
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 11
+    },
+    {
+        "type": "text",
+        "text": "",
+        "text_level": 1,
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "A Proofs of Propositions 3 and 4 ",
+        "text_level": 1,
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Proof of Proposition 3 .Remember that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{h_{x}(z)=\\bar{R}[\\operatorname{tanh}(z^{\\top}x_{1}+x_{2})+2\\operatorname{tanh}(x_{3})]/3.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Let $b_{i}=2i-k$ for $i=0,\\dots,k$ , let $\\zeta>0$ be the positive real such that $\\mathbb{E}_{u\\sim N(0,1)}[2\\operatorname{tanh}(\\zeta\\!+\\!u)]=1$ (note that, this also yields $\\mathbb{E}_{u\\sim N(0,1)}[2\\operatorname{tanh}(-\\zeta+u)]=-1$ by the symmetric property of tanh and the Gaussian distribution), and let ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\xi=[\\underbrace{{\\sqrt{d}},{\\sqrt{d}},\\ldots,{\\sqrt{d}}}_{k\\mathrm{-dimension}},\\underbrace{0,\\ldots,0}_{d\\mathrm{-}k\\mathrm{-}\\mathrm{dimension}}]^{\\top}\\in\\mathbb{R}^{d}.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Let ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\Sigma:=\\binom{I/(2\\lambda_{1})}{0}\\begin{array}{c r c}{0}&{0}&{0}\\\\ {1/(2\\lambda_{1})}&{0}\\\\ {0}&{0}&{1}\\end{array}\\in\\mathbb{R}^{(d+1+1)\\times(d+1+1)},\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "$\\rho>1$ a co $\\xi_{2i}:=[\\log(\\rho k)\\xi^{\\top},-\\log(\\rho k)(b_{i}-$ $1),\\zeta]^{\\top}\\in\\mathbb{R}^{\\bar{d}}$ ∈and $\\xi_{2i+1}:=-[\\log(\\rho k)\\xi^{\\top},-\\log(\\rho k)(b_{i}+1),\\zeta]^{\\top}\\in{\\mathbb R}^{\\bar{d}}$ −−∈for $i=0,\\ldots,k$ , we define ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{\\mu}_{2i}:=N(\\xi_{2i},\\Sigma),\\;\\;\\;\\hat{\\mu}_{2i+1}:=N(\\xi_{2i+1},\\Sigma).\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Then, we can see that, for $z\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ }, it holds that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i}}[h_{x}(z)]=\\bar{R}\\mathbb{E}_{u\\sim N(0,1/\\lambda_{1})}\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\xi,z\\rangle-(b_{i}-1))+u]+1\\}/3\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "e$\\langle x_{1},z\\rangle\\!+\\!x_{2}=\\log(\\rho k)(\\langle\\xi,z\\rangle-(b_{i}\\!-\\!1))\\!+\\!\\sum_{j=1}^{d}u_{j}z_{j}\\!+\\!u_{d+1}$ for $x\\sim N([\\xi^{\\top},(b_{i}-$ $1)]^{\\top},I/(2\\lambda_{1}))$ distribution with mean 0 and variance where $u_{j}\\,\\sim\\,N(0,1/(2\\lambda_{1}))$ ∼$\\begin{array}{r}{\\sum_{j=1}^{d}\\frac{1}{2\\lambda_{1}}\\frac{1}{d}+\\frac{1}{2\\lambda_{1}}=\\frac{1}{\\lambda_{1}}}\\end{array}$ P$\\begin{array}{r}{\\sum_{j=1}^{d}u_{j}z_{j}+u_{d+1}}\\end{array}$ . In the same vein, we also have obeys the Gaussian ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i+1}}[h_{x}(z)]=-\\bar{R}\\mathbb{E}_{u\\sim N(0,1/\\lambda_{1})}\\{\\mathrm{tanh}[\\log(\\rho k)(\\langle\\xi,z\\rangle-(b_{i}+1))+u]+1\\}/3.\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Here, defin $|z|:=|\\{i\\in\\{1,...\\,,k\\}\\mid z_{i}>0\\}|$ for $z\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ the number of positive elements of zin the index set {$\\{1,\\ldots,k\\}$ }. For a fixed number $i\\in\\{0,\\ldots,k\\}$ ∈{ }, we let ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l r}&{}&{f_{1}(z;u)=\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\xi,z\\rangle-(b_{i}-1))+u]+1\\}/3,}\\\\ &{}&{f_{2}(z;u)=\\{\\operatorname{tanh}[\\log(\\rho k)(\\langle\\xi,z\\rangle-(b_{i}+1))+u]+1\\}/3,}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "then we can see that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{1}(z;0)={\\binom{O(1/(\\rho k))}{1-O(1/(\\rho k))}}\\quad(|z|<i),\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "and ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{2}(z;0)={\\binom{O(1/(\\rho k))}{1-O(1/(\\rho k))}}\\quad(|z|<i+1),\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "because $\\begin{array}{r}{\\langle\\xi,z\\rangle-b_{i}=\\sum_{j=1}^{k}\\mathrm{sign}(z_{j})b_{i}=2|z|-k-b_{i}=2(|z|-i).}\\end{array}$ . Hence, we have that ",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u):=f_{1}(z;u)-f_{2}(z;u)={\\biggl\\{}\\Omega(1){\\pmod{0}},\\quad{\\mathrm{(}}|z|=i{\\mathrm{)}},}\\\\ {O(1/(\\rho k))}&{{\\mathrm{(otherwise)}}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Then, since $\\begin{array}{r}{\\operatorname{tanh}(u)+1=\\frac{e^{u}-e^{-u}}{e^{u}+e^{-u}}+1=\\frac{2}{1+e^{-2u}}}\\end{array}$ , if $|z|=i$ and $|u|\\leq1/\\lambda_{1}$ ,",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u)\\geq\\Omega(1),\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "and if $|z|\\neq i$ and $|u|\\le\\log(\\rho k)/2$ ,",
+        "page_idx": 12
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf(z;u)\\leq O(1/(\\rho k)).\n$$",
+        "text_format": "latex",
+        "page_idx": 12
+    },
+    {
+        "type": "text",
+        "text": "Therefore, when $|z|=i$ ,",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{u\\sim N(0,1/\\lambda_{1})}[f(z;u)]\\ge\\int_{-1/\\lambda_{1}}^{1/\\lambda_{1}}f(z;u)g(u)\\mathrm{d}u>\\Omega(1).\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where $g$ is the density function of $N(0,1/\\lambda_{1})$ , and when $|z|\\neq i$ ,",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}_{u\\sim N(0,1/\\lambda_{1})}[f(z;u)]\\le\\displaystyle\\int_{-\\log(\\rho k)/2}^{\\log(\\rho k)/2}f(z;u)g(u)\\mathrm{d}u+\\displaystyle\\int_{|u|\\ge\\log(\\rho k)/2}f(z;u)g(u)\\mathrm{d}z}\\\\ &{\\qquad\\qquad\\qquad\\le O(1/(\\rho k))+O\\left(\\frac{\\exp(-\\lambda_{1}\\log(\\rho k)^{2}/2)}{\\log(\\rho k)}\\right)}\\\\ &{\\qquad\\qquad\\qquad=O(1/(\\rho k)),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where we used the upper-tail inequality of the Gaussian distribution in the second inequality. Hence, it holds that ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{f}_{i}(z):=\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i}}[h_{x}(z)]+\\mathbb{E}_{x\\sim\\hat{\\mu}_{2i+1}}[h_{x}(z)]=\\Big\\{\\Omega(k)\\quad\\mathrm{(}|z|=i),\\quad\\quad}\\\\ {O(1/\\rho)\\quad\\mathrm{(otherwise)},}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "because $\\bar{R}=k$ . Therefore, by taking $\\rho>1$ sufficiently large, we also have ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n{\\hat{f}}(z):={\\frac{1}{2(k+1)}}\\sum_{i=0}^{k}(-1)^{i}{\\hat{f}}_{i}(z)={\\\\binom{\\Omega(1)}{-\\Omega(1)}}\\quad(|z|\\,{\\mathrm{is~even}}),\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where the constant hidden in $\\Omega(\\cdot)$ is uniform over any $|z|$ . Hence, there exists $c_{2}^{\\prime}>0$ such that $Y\\hat{f}(Z)>c_{2}^{\\prime}$ almost surely. Then, if we let $\\mu_{\\langle a\\rangle}(A):=\\mu(a A)$ for $a\\in\\mathbb R$ , a probability measure $\\mu$ and a measurable set $A$ , then we can see that $\\hat{f}$ is represented as ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{f}(\\cdot)=\\mathbb{E}_{x\\sim\\mu^{*}}[h_{x}(\\cdot)],\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "where ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mu^{*}=\\frac{1}{2(k+1)}\\sum_{i=0}^{k}\\bigl(\\hat{\\mu}_{2i,\\langle(-1)^{i}\\rangle}+\\hat{\\mu}_{2i+1,\\langle(-1)^{i}\\rangle}\\bigr).\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Then, by letting $c_{2}=\\ell(0)-\\ell(c_{2}^{\\prime})$ , we have ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\nL(\\mu^{*})\\leq\\ell(0)-c_{2}.\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "Next, we bound the KL -divergence between $\\nu$ and $\\mu^{*}$ . Notice that the convexity of KL-divergence yields that ",
+        "page_idx": 13
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathrm{KL}(\\nu,\\mu^{*})\\leq\\displaystyle\\frac{1}{2(k+1)}\\sum_{i=0}^{k}(\\mathrm{KL}(\\nu,\\hat{\\mu}_{2i})+\\mathrm{KL}(\\nu,\\hat{\\mu}_{2i+1}))}\\\\ &{\\qquad\\qquad\\leq\\lambda_{1}\\log(\\rho k)^{2}[\\|\\xi\\|^{2}+(\\displaystyle\\operatorname*{max}_{i}|b_{i}|+1)^{2}]+\\log(1/(2\\lambda_{1}))+\\lambda_{1}(1+\\zeta^{2})}\\\\ &{\\qquad\\qquad=O(\\log(k)^{2}(d k+k^{2}))=O(\\log(k)^{2}d k)\\ \\left(=R\\right),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "because $k\\leq d$ , which gives the assertion. ",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "be seen by $\\bar{L}(\\mu_{[\\lambda]})\\leq\\bar{L}(\\mu^{*})+\\lambda\\mathrm{KL}(\\nu||\\mu^{*})\\leq\\ell(0)-$ $c_{2}+\\lambda R<\\ell(0)-c_{2}+c_{2}/2=\\ell(0)-c_{2}/2$ −, by $\\lambda$ ch that $\\lambda<c_{2}/(2R)$ . The same argument is also applied to $L(\\mu_{[\\lambda]})$ , that is, $L(\\mu_{[\\lambda]})\\leq\\bar{\\ell}(0)-c_{2}/2$ ≤−.",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "We show that the optimal solution $f_{\\mu_{[\\lambda]}}$ should satisfy $|f_{\\mu_{[\\lambda]}}(z)|\\ =\\ |f_{\\mu_{[\\lambda]}}(z^{\\prime})|$ for all $z,z^{\\prime}\\ \\in$ $\\{\\pm1/\\sqrt{d}\\}^{d}$ action on }$\\{-1/\\sqrt{d},1/\\sqrt{d}\\}^{d}$ by the symmetric property of the distribution. For that purpose, we construct a gr }. For notational simplicity, we consider $\\mathbf{Z}^{d}:=\\{-1,+1\\}^{d}$ instead. ${\\bf Z}^{d}$ can be equipped with a gr e the n between $z,z^{\\prime}\\in\\mathbf{Z}^{d}$ is given by he element $\\boldsymbol{z}\\cdot\\boldsymbol{z}^{\\prime}=(z_{i}z_{i}^{\\prime})_{i=1}^{d}$ . Let $T_{j}:\\mathbf{\\dot{Z}}^{d}\\xrightarrow{}\\mathbf{Z}^{d}$ →be a group action that flips the $j$ -th element $T_{j}z\\,=\\,(z_{1},\\ldots,-z_{j},\\ldots,z_{d})$ −. It is obvious that $T_{j}$ is bijective. Then, we can show that there exists a sequence of indices $\\sigma(1),\\ldots,\\sigma(2^{d})\\in\\{1,\\ldots,d\\}$ “orbit” generated by the chain the group actions $T_{\\sigma(k)}\\circ\\cdots\\circ T_{\\sigma(2)}\\circ T_{\\sigma(1)}z$ for $k=1,\\ldots,2^{d}$ covers the entire $T_{\\sigma(2^{d})}z\\,=\\,z$ elements of ${\\bf Z}^{d}$ . This can be shown by induction. If for any initial state $z\\,\\in\\,\\mathbf{Z}^{d}$ ∈and the $d=1$ tate turns back to the i , we just need to take $\\sigma(1)\\,=\\,\\sigma(2)\\,=\\,1$ (indeed, $T_{\\sigma(1)}z\\,=\\,-z$ $T_{\\sigma(2)}\\circ T_{\\sigma(1)}z\\,=\\,z$ , which satisfies the co ). Suppose that the argument is true for $d=1,2,\\ldots,d^{\\prime}-1$ −, then we show e for d$d=d^{\\prime}$ . Indeed, if we write $\\bar{\\sigma^{\\prime}}(1),\\ldots,\\sigma^{\\prime}(2^{d^{\\prime}-1})$ be the corresponding sequence for $d=d^{\\prime}-1$ −, then let ",
+        "page_idx": 13
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sigma(i)=\\sigma^{\\prime}(i)\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "for $i=1,\\ldots,2^{d^{\\prime}-1}-1$ , then the corresponding orbit covers all the with the last element is fixed except the initial state. Then, we flip the last coordinate at the $2^{d^{\\prime}-1}+1$ -th step as ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sigma(2^{d^{\\prime}-1})=d,\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "and then we “trace-back” the orbit as ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\sigma(2^{d^{\\prime}-1}+i)=\\sigma^{\\prime}(2^{d^{\\prime}-1}-i),\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "for $i=1,\\ldots,2^{d^{\\prime}-1}-1$ . By the construction, we notice that, after $2^{d^{\\prime}-1}+2^{d^{\\prime}-1}-1$ steps, the state becomes ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\nT_{\\sigma(2^{d^{\\prime}}-1)}\\circ T_{\\sigma(2^{d^{\\prime}}-2)}\\circ\\cdots\\circ T_{\\sigma(1)}z=[z_{1},\\ldots,z_{d^{\\prime}-1},-z_{d^{\\prime}}]^{\\top}.\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Therefore, by flipping the last coordinate again, the state can come back to the initial state, that is, by ing $\\sigma(2^{d^{\\prime}})=d$ , we have $T_{\\sigma(2^{d^{\\prime}})}\\circ\\cdots\\circ T_{\\sigma(1)}z=z$ while the orbit covers the entire elements of $\\mathbf{Z}^{d^{\\prime}}$ .",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "We can define the action $T_{j}$ to $\\{\\pm1/\\sqrt{d}\\}^{d}$ }in the same manner. We note that the distribution of $Z$ is invariant against the action of $T_{j}$ , that is, $P_{Z}=T_{j_{\\#}}P_{Z}$ where $T_{j\\neq}$ is the push-forward induced by $T_{j}$ . Here, let $\\hat{\\mu}:=\\mu_{[\\lambda]}$ and $\\hat{f}\\,=\\,f_{\\hat{\\mu}}$ . We also define an “adjoint operator” $T_{j}^{*}:\\mathcal{P}\\rightarrow\\mathcal{P}$ for $j\\in\\{k+1,\\ldots,d\\}$ such that $f_{\\mu}(T_{j}z)=f_{T_{j}^{*}\\mu}(z)$ for all $z\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ }. We can easily check that there exists $T_{j}^{*}\\mu$ that satisfies this condition. Indeed, we may take $T_{j}^{*}\\mu$ such that $T_{j}^{*}\\mu(A\\times B\\times C)=$ $\\mu(T_{j}A\\times B\\times C)$ where $T_{j}A=\\{T_{j}z\\mid z\\in A\\}$ for any measurable set $A\\in\\mathbb{B}(\\mathbb{R}^{d})$ ,$B\\in\\mathbb{B}(\\mathbb{R})$ and $C\\in\\mathbb{B}(\\mathbb{R})$ sigma algebra ∈. Since the probability on product sets uniquely determines the probability on the Borel $\\mathbb{B}(\\mathbb{R}^{d})\\times\\mathbb{B}(\\mathbb{R})\\times\\mathbb{B}(\\mathbb{R})=\\mathbb{B}(\\mathbb{R}^{d+2})$ ,$T_{j}^{*}\\mu$ is uniquely determined. ",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Now, we consider the sequence of the group action $T_{\\sigma(1)},\\ldots,T_{\\sigma(2^{d-k})}$ constructed above acting on the last $d-k$ coordinates. Since th ndent of the last $\\mathit{\\Pi}\\dot{d}-k$ coordinates, we have $L(T_{\\sigma(1)}^{*}\\circ\\dots\\circ T_{\\sigma(i)}^{*}{\\hat{\\mu}})=L({\\hat{\\mu}})$ distribution yields that $\\mathrm{KL}(\\nu,T_{j}^{*}\\mu)=\\mathrm{KL}(\\nu,\\mu)$ for all $i=1,\\ldots,2^{d-k}$ . Hence, if we take . Moreover, the symmetricity of the Gaussian ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{\\mu}^{\\prime}=\\frac{1}{2^{d-k}}\\sum_{i=1}^{2^{d-k}}T_{\\sigma(1)}^{*}\\circ\\dotsb\\circ T_{\\sigma(i)}^{*}\\hat{\\mu},\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "then by the convexity of the objective $\\mathcal{L}$ , we have ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\n{\\mathcal{L}}({\\hat{\\mu}}^{\\prime})\\leq{\\frac{1}{2^{d-k}}}\\sum_{i=1}^{2^{d-k}}{\\mathcal{L}}(T_{\\sigma(1)}^{*}\\circ\\dotsb\\circ T_{\\sigma(i)}^{*}{\\hat{\\mu}})\\leq{\\mathcal{L}}({\\hat{\\mu}}).\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "we notice that Then, by the strong convexity of the objective $\\mathcal{L}$ (due to the KL-divergence), we have $\\hat{\\mu}^{\\prime}=\\hat{\\mu}$ . Then, ",
+        "page_idx": 14
+    },
+    {
+        "type": "equation",
+        "text": "$$\nf_{\\hat{\\mu}}(z)=\\frac{1}{2^{d-k}}\\sum_{i=1}^{2^{d-k}}f_{\\hat{\\mu}}(T_{\\sigma(i)}\\circ\\dotsb\\circ T_{\\sigma(1)}z),\n$$",
+        "text_format": "latex",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "for any $z\\,\\in\\,\\{\\pm1/\\sqrt{d}\\}^{d}$ }, which means that $f_{\\hat{\\mu}}(z)$ is constant against any change of the last $d-k$ coordinates. ",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "Next, we consider to change the first $k$ coordinates. We also construct a sequence of the group action $T_{\\sigma(1)},\\dots,T_{\\sigma(2^{k})}$ acting on the first $k$ coordinates. In this case, the action of $T_{j}$ on $z$ also flips the ",
+        "page_idx": 14
+    },
+    {
+        "type": "text",
+        "text": "corresponding label. Hence, if $y_{(z)}$ is the label of $z$ , then the label for $T_{j}z$ is $-y_{(z)}=y_{(T_{j}z)}$ . By defining the adjoint operator $T_{j}^{*}$ as ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\nT_{j}^{*}\\mu(A\\times B\\times C)=\\mu((-T_{j}A)\\times(-B)\\times(-C)),\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "for $j\\in\\{1,\\ldots,k\\}$ , then by the symmetric shape of tanh , we have ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\ny_{(T_{j}z)}f_{\\hat{\\mu}}(T_{j}z)=y_{(z)}f_{T_{j}^{*}\\hat{\\mu}}(z),\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "for any $z\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ }. We also have that $\\mathrm{KL}(\\nu,\\hat{\\mu})=\\mathrm{KL}(\\nu,T_{j}^{*}\\hat{\\mu})$ by the symmetry of the Gaussian distribution. Therefore, onece again by the invariance of the $P_{Z}$ against the action of $T_{j}$ and the convexity of $\\mathcal{L}$ , we have that ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r}{\\mathcal{L}(\\hat{\\mu}^{\\prime})\\leq\\mathcal{L}(\\hat{\\mu}),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "where ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\hat{\\mu}^{\\prime}=\\frac{1}{2^{k}}\\sum_{i=1}^{2^{k}}T_{\\sigma(1)}^{*}\\circ\\dotsb\\circ T_{\\sigma(i)}^{*}\\hat{\\mu}.\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "By the strong convexity of $\\mathcal{L}$ due to the KL-divergence term, we have $\\mu\\mu^{\\prime}=\\hat{\\mu}$ . Hence, ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\ny_{z}f_{\\hat{\\mu}}(z)=\\frac{1}{2^{k}}\\sum_{i=1}^{2^{k}}y_{(T_{\\sigma(i)}\\circ\\cdots\\circ T_{1}z)}f_{\\hat{\\mu}}(T_{\\sigma(i)}\\circ\\cdots\\circ T_{1}z),\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "for any $z\\in\\{\\pm1/\\sqrt{d}\\}^{d}$ }, which means that $y_{z}f_{\\hat{\\mu}}(z)$ is constant. ",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "ng Eq. (9 )with the fact $\\bar{L}(\\hat{\\mu})\\leq\\ell(0)-c_{2}/2$ , we have that $P(Y f_{\\hat{\\mu}}(Z)>0)=1$ and $Y f_{\\hat{\\mu}}(\\dot{Z})\\geq c_{2}/2$ ≥almost surely because ∥$\\|\\ell^{\\prime}\\|_{\\infty}\\leq1$ ∥∞≤.",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "BProofs of auxiliary lemmas ",
+        "text_level": 1,
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "B.1 Difference between finite particle network and its integral form for the optimal solution ",
+        "text_level": 1,
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Lemma 2. Under Assumption $I,\\,i f\\,\\|z\\|\\le1$ for any $z\\in\\mathrm{supp}(P_{Z})$ , then it holds that ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{5}_{\\mathcal{X}_{\\bullet}\\sim(\\mu^{*})^{\\otimes N}}\\left[\\operatorname*{sup}_{z\\in\\operatorname{supp}(P_{Z})}\\left(\\frac{1}{N}\\sum_{i=1}^{N}h_{X_{\\bullet}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right)^{2}\\right]\\leq\\frac{16\\bar{R}^{2}}{N}\\left[1+2\\left(\\frac{2\\bar{R}^{2}}{(\\lambda\\lambda_{1})^{2}}+\\frac{\\bar{d}}{\\lambda_{1}}\\right)\\right]\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "Proof. Note that the left hand side can be rewritten as ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{X_{*}^{i}\\sim\\mu^{*}}\\left[\\left(\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\left|\\frac{1}{N}\\sum_{i=1}^{N}h_{X_{*}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right|\\right)^{2}\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "From the standard argument of concentration inequality corresponding to the Rademacher complexity, it holds that ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{l l}{\\displaystyle P\\left(\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\left|\\frac{1}{N}\\sum_{i=1}^{N}h_{X_{*}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right|\\right.}\\\\ {\\displaystyle\\left.\\qquad\\geq2\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\left|\\frac{1}{N}\\sum_{i=1}^{N}\\epsilon_{i}h_{X_{*}^{i}}(z)\\right|\\right]+\\sqrt{\\frac{2t\\bar{R}^{2}}{N}}\\right)}\\\\ {\\displaystyle\\leq\\exp(-t),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "text",
+        "text": "for any an i.i.d. sequence generated from $t>0$ , where $\\epsilon=(\\epsilon_{i})_{i=1}^{N}$ $\\mu^{*}$ is an i.i.d. sequence of the Rademacher variable, , and the probability is taken with respect to the realization of $\\mathcal{X}_{*}=(X_{*}^{i})_{i=1}^{N}$ ∗$\\mathcal{X}_{*}$ is .Since tanh is Lipschitz continuous with $|\\operatorname{tanh}^{\\prime}|\\leq1$ , the contraction inequality of the Rademacher complexity yields that ",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\left|\\frac{1}{N}\\sum_{i=1}^{N}\\epsilon_{i}h_{X_{*}^{i}}(z)\\right|\\right]\n$$",
+        "text_format": "latex",
+        "page_idx": 15
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\le2\\displaystyle\\frac{\\bar{R}}{3}\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{z})}\\left|\\frac{1}{N}\\displaystyle\\sum_{i=1}^{N}\\epsilon_{i}(z^{\\top}X_{*,1}^{i}+X_{*,2}^{i})\\right|\\right]+\\frac{2\\bar{R}}{3}\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\bigg|\\frac{1}{N}\\displaystyle\\sum_{i=1}^{N}\\epsilon_{i}\\mathrm{tanh}(X_{*,3}^{i})\\bigg|\\right]}\\\\ &{\\le2\\displaystyle\\frac{\\bar{R}}{3}\\sqrt{\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\operatorname*{supp}_{\\bar{P}_{z}}(\\|z\\|^{2}+1)\\left\\|\\frac{1}{N}\\displaystyle\\sum_{i=1}^{N}\\epsilon_{i}[X_{*,1}^{i};X_{*,2}^{i}]\\right\\|^{2}\\right]}}\\\\ &{\\phantom{2p c}+\\frac{2\\bar{R}}{3}\\sqrt{\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\bigg|\\frac{1}{N}\\displaystyle\\sum_{i=1}^{N}\\epsilon_{i}\\mathrm{tanh}(X_{*,3}^{i})\\bigg|^{2}\\right]}}\\\\ &{\\le2\\displaystyle\\frac{\\bar{R}\\sqrt{2}}{3}\\sqrt{\\frac{1}{N}\\mathbb{E}[\\|X_{*,1}^{1}\\|^{2}+(X_{*,2}^{1})^{2}]}+\\frac{2\\bar{R}}{3N\\bar{N}}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "To bound the right hand side, we evaluate the moment of $\\mu^{*}$ . Since $\\mu^{*}$ is the stationary distribution of the S 1 ). Hence, if $X_{0}\\sim\\mu^{*}$ , the process $(X_{t})_{t\\geq0}$ obeying the MFLD (1 )satisfies $X_{t}\\sim\\mu^{*}$ for any $t\\geq0$ ≥. Then, the infinitesimal generator of the MFLD gives that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{0=\\cfrac{\\mathrm{d}}{\\mathrm{d}t}\\mathbb{E}[\\|X_{t}\\|^{2}]=\\mathbb{E}\\left[(2X_{t})^{\\top}\\left(-\\nabla\\frac{\\delta L(\\mu_{t})}{\\delta\\mu}(X_{t})-\\lambda\\lambda_{1}X_{t}\\right)+2\\lambda\\bar{d}\\right]}\\\\ &{\\qquad\\qquad\\qquad=-2\\lambda\\lambda_{1}\\mathbb{E}\\left[\\|X_{t}\\|^{2}\\right]+\\mathbb{E}\\left[(2X_{t})^{\\top}\\left(\\nabla\\frac{\\delta L(\\mu_{t})}{\\delta\\mu}(X_{t})\\right)\\right]+2\\lambda\\bar{d}}\\\\ &{\\qquad\\qquad\\qquad=-2\\lambda\\lambda_{1}\\mathbb{E}\\left[\\|X_{t}\\|^{2}\\right]+\\mathbb{E}\\left[\\lambda\\lambda_{1}\\|X_{t}\\|^{2}+\\frac{1}{\\lambda\\lambda_{1}}\\left\\|\\nabla\\frac{\\delta L(\\mu_{t})}{\\delta\\mu}(X_{t})\\right\\|^{2}\\right]+2\\lambda\\bar{d},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "which yields that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}\\left[\\lVert X_{t}\\rVert^{2}\\right]\\leq\\frac{(2\\bar{R})^{2}}{(\\lambda\\lambda_{1})^{2}}+\\frac{2\\bar{d}}{\\lambda_{1}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Therefore, ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{\\epsilon,\\mathcal{X}_{*}}\\left[\\operatorname*{sup}_{z\\in\\mathrm{supp}(P_{Z})}\\left|\\frac{1}{N}\\sum_{i=1}^{N}\\epsilon_{i}h_{X_{*}^{i}}(z)\\right|\\right]\\leq\\frac{2\\bar{R}}{3\\sqrt{N}}\\left(2\\sqrt{\\frac{2\\bar{R}^{2}}{(\\lambda\\lambda_{1})^{2}}+\\frac{\\bar{d}}{\\lambda_{1}}}+1\\right)=:\\frac{\\bar{D}}{\\sqrt{N}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "Then, for $x\\geq0$ , it holds that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{l}{P\\left[\\left(\\underset{z\\in\\mathrm{supp}(P_{Z})}{\\operatorname*{sup}}\\left|\\frac{1}{N}\\sum_{i=1}^{N}h_{X_{*}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right|\\right)^{2}\\geq x\\right]}\\\\ {\\leq\\operatorname*{min}\\left\\{1,\\exp\\left(-\\frac{N}{4\\bar{R}^{2}}\\left(x-\\frac{8\\bar{D}^{2}}{N}\\right)\\right)\\right\\}.}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "This yields that ",
+        "page_idx": 16
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\mathbb{E}\\left[\\left(\\underset{z\\in\\mathrm{supp}(P_{\\mathcal{Z}})}{\\operatorname*{sup}}\\left|\\frac{1}{N}\\sum_{i=1}^{N}h_{\\mathcal{X}_{i}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right|\\right)^{2}\\right]}\\\\ &{\\leq\\int_{0}^{\\infty}P\\left[\\left(\\underset{z\\in\\mathrm{supp}(P_{\\mathcal{Z}})}{\\operatorname*{sup}}\\left|\\frac{1}{N}\\sum_{i=1}^{N}h_{\\mathcal{X}_{i}^{i}}(z)-\\int h_{x}(z)\\mathrm{d}\\mu^{*}(z)\\right|\\right)^{2}\\geq x\\right]\\mathrm{d}x}\\\\ &{\\leq\\frac{8\\bar{D}^{2}}{N}+\\int_{0}^{\\infty}\\exp\\left(-\\frac{N}{4\\bar{R}^{2}}\\bar{x}\\right)\\mathrm{d}\\bar{x}}\\\\ &{\\leq\\frac{8\\bar{D}^{2}}{N}+\\frac{4\\bar{R}^{2}}{N}\\leq\\frac{16\\bar{R}^{2}}{N}\\left[1+2\\left(\\frac{2\\bar{R}^{2}}{(\\lambda\\lambda)^{2}}+\\frac{\\bar{d}}{\\lambda_{1}}\\right)\\right].}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "This gives the assertion. ",
+        "page_idx": 16
+    },
+    {
+        "type": "text",
+        "text": "B.2 Proof of Lemma 1 ",
+        "text_level": 1,
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "The proof follows the line of Lemma 5.5 of Chen et al. (2020 ). Let the empirical Rademacher complexity of a function class $\\tilde{\\mathcal F}$ be ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\widehat{\\mathrm{Rad}}(\\tilde{\\mathcal{F}}):=\\mathbb{E}_{\\epsilon}\\left[\\operatorname*{sup}_{\\mu\\in\\tilde{\\mathcal{F}}}\\frac{1}{n}\\sum_{i=1}^{n}\\epsilon_{i}f(z_{i})\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "We can see that $\\operatorname{Rad}(\\cdot)=\\mathbb{E}_{(z_{i})_{i=1}^{n}}[{\\widehat{\\operatorname{Rad}}}(\\cdot)]$ . Then, it holds that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\widehat{\\mathrm{Rad}}(\\mathcal{F}_{M}(\\mu^{\\circ}))=\\frac{1}{\\gamma}\\mathbb{E}_{\\epsilon}\\left[\\underset{\\mu\\in\\mathcal{F}_{M}(\\mu^{\\circ})}{\\operatorname*{sup}}\\frac{\\gamma}{n}\\sum_{i=1}^{n}\\epsilon_{i}\\int h_{x}(z_{i})\\mathrm{d}\\mu(x)\\right]}\\\\ &{\\qquad\\qquad\\qquad\\leq\\frac{1}{\\gamma}\\left\\{M+\\mathbb{E}_{\\epsilon}\\log\\left[\\displaystyle\\int\\exp\\left(\\frac{\\gamma}{n}\\sum_{i=1}^{n}\\epsilon_{i}h_{x}(z_{i})\\right)\\mathrm{d}\\mu^{\\circ}(x)\\right]\\right\\}}\\\\ &{\\qquad\\qquad\\qquad\\leq\\frac{1}{\\gamma}\\left\\{M+\\log\\int\\mathbb{E}_{\\epsilon}\\left[\\exp\\left(\\frac{\\gamma}{n}\\sum_{i=1}^{n}\\epsilon_{i}h_{x}(z_{i})\\right)\\right]\\mathrm{d}\\mu^{\\circ}(x)\\right\\},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "where the first inequality is by the Donsker-Varadha duality formula of the KL-divergence ( Donsker and Varadhan ,1983 ). The second term in the right hand side can be bounded as ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbb{E}_{\\epsilon}\\left[\\exp\\left(\\frac{\\gamma}{n}\\sum_{i=1}^{n}\\epsilon_{i}h_{x}(z_{i})\\right)\\right]\\leq\\mathbb{E}_{\\epsilon}\\left[\\exp\\left(\\frac{\\gamma^{2}}{n^{2}}\\sum_{i=1}^{n}\\epsilon_{i}^{2}h_{x}(z_{i})^{2}\\right)\\right]\\leq\\exp\\left(\\frac{\\gamma^{2}}{n}\\bar{R}^{2}\\right).\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Therefore, we have that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\widehat{\\mathrm{Rad}}({\\mathcal F}_{M}(\\mu^{\\circ}))\\leq{\\frac{1}{\\gamma}}\\left\\{M+{\\frac{\\gamma^{2}}{n}}\\bar{R}^{2}\\right\\}.\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "The right hand side can be minimized by $\\gamma=\\sqrt{n M}/\\bar{R}$ , which yields ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n{\\widehat{\\mathrm{Rad}}}({\\mathcal{F}}_{M}(\\mu^{\\circ}))\\leq2{\\bar{R}}{\\sqrt{\\frac{M}{n}}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "This gives the assersion. ",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "CProofs of Theorems 1 and 2 ",
+        "text_level": 1,
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "To show the theorems, we first prepare the following uniform bound, which is crucial to obtain the fast learning rate. ",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "Lemma 3. It holds that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\mu)-L(\\mu)+L(\\mu^{*})-\\bar{L}(\\mu^{*})}\\\\ &{\\leq2\\left[\\mathrm{Rad}(\\mathcal{F}_{\\mathrm{2KL}(\\mu,\\mu^{*})\\vee\\frac{1}{n}}(\\mu^{*}))+(2\\|f_{\\mu}-f_{\\mu^{*}}\\|_{\\infty}\\vee n^{-1})\\sqrt{\\frac{t+\\log\\log_{2}\\left(8n^{2}M\\bar{R}\\right)}{n}}\\right],}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "uniformly over $\\mu\\in\\mathcal P$ with $\\mathrm{KL}(\\mu,\\mu^{*})\\leq M$ with probability $1-\\exp(-t)$ for any $t>0$ .",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "$B_{k}\\ =\\ M/2^{-k}$ $C_{k}\\ =\\ 2\\bar{R}/2^{-k^{\\prime}}$ for $k\\ =\\ 0,1,2,...,$ , and $\\mathcal{F}_{k,k^{\\prime}}\\;:=\\;\\{\\mu\\;\\in\\;\\mathcal{P}\\;\\}$ $\\mathrm{KL}(\\mu,\\mu^{*})\\,\\leq,\\|f_{\\mu}\\,-\\,f_{\\mu^{*}}\\|_{\\infty}\\,\\leq\\,C_{k}\\}$ the Rademacher complexity (Theorem 3.1 of −∞}. Then, the standard concentration inequality regarding to Mohri et al. (2012 )) with the contraction inequality (Theorem 11.6 of Boucheron et al. (2013 ) or Theorem 4.12 of Ledoux and Talagrand (1991 )) yields that ",
+        "page_idx": 17
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP\\left(\\operatorname*{sup}_{\\mu\\in\\mathcal{F}_{k,k^{\\prime}}}\\bar{L}(\\mu)-L(\\mu)+L(\\mu^{*})-\\bar{L}(\\mu^{*})\\leq2\\left[\\mathrm{Rad}(\\mathcal{F}_{B_{k}}(\\mu^{*}))+C_{k}\\sqrt{\\frac{t}{n}}\\right]\\right)\\geq1-\\exp(-t),\n$$",
+        "text_format": "latex",
+        "page_idx": 17
+    },
+    {
+        "type": "text",
+        "text": "$k,k^{\\prime}$ , sinc $\\|f_{\\mu}-f_{\\mu^{\\prime}}\\|_{\\infty}\\leq2\\bar{R}$ for any $\\mu,\\mu^{\\prime}\\in\\mathcal{P}$ , by taking uniform bound for all $k=0,\\ldots,\\log_{2}(n^{2})$ and $k^{\\prime}=0,\\ldots,\\log_{2}(2\\bar{R}n)$ , we have that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{>\\left(\\bar{L}(\\mu)-L(\\mu)+L(\\mu^{*})-\\bar{L}(\\mu^{*})\\leq2\\left[\\mathrm{Rad}(\\mathcal{F}_{\\mathrm{2KL}(\\mu,\\mu^{*})\\vee\\frac{1}{n}}(\\mu^{*}))+(2\\|f_{\\mu}-f_{\\mu^{*}}\\|_{\\infty}\\vee\\frac{1}{n})\\sqrt{\\frac{t}{n}}\\right],}\\\\ &{\\forall f\\in\\mathcal{F}_{n}(\\mu^{*})\\right)\\geq1-(2+\\log_{2}(n M)+\\log_{2}(2\\bar{R}n))\\exp(-t).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "By resetting $t\\leftarrow t+\\log\\log_{2}(8n^{2}M\\bar{R})$ , we obtain the assertion. ",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "C.1 Proof of Theorem 1 ",
+        "text_level": 1,
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "By Assumption 2 , we have ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\operatorname*{max}\\{\\bar{L}\\big(\\mu_{\\lbrack\\lambda^{(K)}\\rbrack}\\big),L\\big(\\mu_{\\lbrack\\lambda^{(K)}\\rbrack}\\big)\\}\\leq\\ell(0)-c_{0},\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "and ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP\\left(Y f_{\\mu_{\\left[\\lambda\\left(K\\right)\\right]}}(Z)\\geq c_{0}\\right)=1.\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Let $\\hat{\\mu}:=\\mu^{(K)}$ and $\\mu^{*}:=\\mu_{[\\lambda^{(K)}]}$ . By the optimality condition of $\\hat{\\mu}$ , we have ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\nL(\\hat{\\mu})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\hat{\\mu})\\leq L(\\mu_{[\\lambda^{(K)}]})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\mu_{[\\lambda^{(K)}]})+\\epsilon^{*}<1/2-2\\delta^{*}=c_{0}.\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Moreover, ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\hat{\\mu})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\hat{\\mu})-(\\bar{L}(\\mu^{*})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\mu^{*}))}\\\\ &{\\leq L(\\hat{\\mu})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\hat{\\mu})-(L(\\mu^{*})+\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\nu))+(\\bar{L}(\\hat{\\mu})-L(\\hat{\\mu})+L(\\mu^{*})-\\bar{L}(\\mu^{*}))}\\\\ &{\\leq\\epsilon^{*}+(\\bar{L}(\\hat{\\mu})-L(\\hat{\\mu})+L(\\mu^{*})-\\bar{L}(\\mu^{*})).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "By the optimality of $\\mu^{*}$ , the right hand side can be lower bounded as ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\hat{\\mu})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\hat{\\mu})-(\\bar{L}(\\mu^{*})+\\lambda^{(K)}\\mathrm{KL}(\\nu,\\mu^{*}))}\\\\ &{\\geq\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\displaystyle\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}+\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu}).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Then, we have $\\mathrm{KL}(\\mu^{*},\\hat{\\mu})\\le(\\epsilon^{*}+2(\\bar{R}+1))/\\lambda^{(K)}$ . Hence, the uniform bound on the Rademacher complexity (Lemma 3 ) with $M_{0}=(\\epsilon^{*}+2(\\bar{R}+1))/\\lambda^{(K)}$ , it holds that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\hat{\\mu})-L(\\hat{\\mu})+L(\\mu^{*})-\\bar{L}(\\mu^{*})}\\\\ &{\\leq2\\left[\\mathrm{Rad}(\\mathcal{F}_{\\mathrm{2KL}(\\mu^{*},\\hat{\\mu})\\vee\\frac{1}{n}}(\\mu^{*}))+(2\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}\\vee n^{-1})\\sqrt{\\frac{t+\\log\\log_{2}\\left(8n^{2}M_{0}\\bar{R}\\right)}{n}}\\right],}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\exp(-t)$ for any $t>0$ . Moreover, Lemma 1 gives ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\operatorname{Rad}({\\mathcal{F}}_{2\\mathrm{KL}({\\hat{\\mu}},\\mu^{*})\\vee{\\frac{1}{n}}}(\\mu^{*}))\\leq2{\\bar{R}}{\\sqrt{\\frac{2\\mathrm{KL}(\\mu^{*},{\\hat{\\mu}})\\vee n^{-1}}{n}}}.\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "Therefore, by setting $t=s\\sqrt{n}$ with $s<1$ , we obtain that ",
+        "page_idx": 18
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}+\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}\\\\ &{\\leq2\\left[2\\bar{R}\\sqrt{\\frac{2\\mathrm{KL}\\left(\\mu^{*},\\hat{\\mu}\\right)\\,\\mathrm{V}\\,n^{-1}}{n}}+(2\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}\\vee n^{-1})\\sqrt{\\frac{s\\sqrt{n}+\\log\\log_{2}\\left(8n^{2}M_{0}\\bar{R}\\right)}{n}}\\right]}\\\\ &{\\leq\\frac{1}{4}\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})+\\frac{32\\bar{R}^{2}}{n\\lambda^{(K)}}+\\frac{4\\bar{R}}{n}}\\\\ &{\\phantom{2p c}+\\lambda^{(K)}\\frac{\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}^{2}}{8\\bar{R}^{2}}+\\frac{\\lambda^{(K)}}{32\\bar{R}^{2}n^{2}}+\\frac{8\\bar{R}^{2}}{\\lambda(K)}\\frac{s\\sqrt{n}}{n}\\sqrt{n+\\log\\log_{2}\\left(8n^{2}M_{0}\\bar{R}\\right)},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 18
+    },
+    {
+        "type": "text",
+        "text": "$1-\\exp(-s{\\sqrt{n}})$ , where a arithmetic-geometric mean relation and an inequality $(a\\vee\\bar{b})^{2}\\:\\leq\\:a^{2}\\:\\dot{+}\\:b^{2}$ distance between ∨≤$\\mu^{*}$ and $(a,b\\ge0)$ ˆ≥can be bounded as are used in the last inequality. Here, we know that the Hellinger ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n2\\int(\\sqrt{\\mu^{*}}-\\sqrt{\\hat{\\mu}})^{2}\\mathrm{d}x=2\\mathrm{d}_{\\mathrm{H}}(\\mu^{*},\\hat{\\mu})\\leq\\mathrm{KL}(\\mu^{*},\\hat{\\mu}).\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Hence, ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}{\\lefteqn{\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}^{2}=\\|\\int h_{x}(\\cdot)(\\hat{\\mu}(x)-\\mu^{*}(x))\\mathrm{d}x\\|_{\\infty}^{2}}}\\\\ &{=\\left\\|\\int h_{x}(\\cdot)(\\sqrt{\\hat{\\mu}(x)}+\\sqrt{\\mu^{*}(x)})(\\sqrt{\\hat{\\mu}(x)}-\\sqrt{\\mu^{*}(x)})\\mathrm{d}x\\right\\|_{\\infty}^{2}}\\\\ &{\\leq\\left\\|\\int h_{x}(\\cdot)^{2}(\\sqrt{\\hat{\\mu}(x)}+\\sqrt{\\mu^{*}(x)})^{2}\\mathrm{d}x\\right\\|_{\\infty}\\int(\\sqrt{\\hat{\\mu}(x)}-\\sqrt{\\mu^{*}(x)})^{2}\\mathrm{d}x}\\\\ &{\\leq\\left\\|2\\int h_{x}(\\cdot)^{2}(\\hat{\\mu}(x)+\\mu^{*}(x))\\mathrm{d}x\\right\\|_{\\infty}\\int(\\sqrt{\\hat{\\mu}(x)}-\\sqrt{\\mu^{*}(x)})^{2}\\mathrm{d}x}\\\\ &{\\leq4\\bar{R}^{2}\\mathrm{d}_{\\mathbb{H}}(\\mu^{*},\\hat{\\mu})\\leq2\\bar{R}^{2}\\mathrm{KL}(\\mu^{*},\\hat{\\mu}).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "By summarizing the argument above and noticing $\\begin{array}{r}{\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}\\geq0}\\end{array}$ , it holds that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}+\\cfrac{1}{2}\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}\\\\ &{\\leq\\cfrac{1}{2}\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}\\\\ &{\\leq\\cfrac{32\\bar{R}^{2}}{n\\lambda^{(K)}}+\\cfrac{4\\bar{R}}{n}+\\cfrac{\\lambda^{(K)}}{32\\bar{R}^{2}n^{2}}+\\cfrac{8\\bar{R}^{2}}{\\lambda^{(K)}}\\cfrac{s\\sqrt{n}+\\log\\log_{2}(8n^{2}M_{0}\\bar{R})}{n},}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\exp(-s{\\sqrt{n}})$ . Then, letting $s=\\tau\\lambda^{(K)}$ , then we have ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\|f_{\\hat{\\mu}}-f_{\\mu^{*}}\\|_{\\infty}^{2}}\\\\ &{\\leq4\\bar{R}^{2}\\left(\\frac{32\\bar{R}^{2}}{n\\lambda^{(K)2}}+\\frac{4\\bar{R}}{n\\lambda^{(K)}}+\\frac{1}{32\\bar{R}^{2}n^{2}}+8\\bar{R}^{2}\\frac{\\tau\\lambda^{(K)}\\sqrt{n}+\\log\\log_{2}\\left(8n^{2}M_{0}\\bar{R}\\right)}{n\\lambda^{(K)2}}\\right)}\\\\ &{\\leq\\frac{4\\bar{R}^{2}}{n\\lambda^{(K)2}}\\left(32\\bar{R}^{2}+4\\bar{R}\\lambda^{(K)}+\\frac{\\lambda^{(K)2}}{32\\bar{R}^{2}n}+8\\bar{R}^{2}[\\tau\\sqrt{n\\lambda^{(K)2}}+\\log\\log_{2}(8n^{2}M_{0}\\bar{R})]\\right),}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "with probability $1-\\exp(-\\tau\\lambda^{(K)}\\sqrt{n})$ for any $\\tau>0$ . Hen , if we take $n$ sufficiently large and $\\tau$ sufficiently small so that the right hand side is smaller than $c_{0}^{2}$ , then we have ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\nP\\left(Y f_{\\hat{\\mu}}(Z)>0\\right)=1.\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "More precisely, if we let ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\ns_{n}=\\frac{n\\lambda^{(K)2}}{32\\bar{R}^{4}}\\left\\{c_{0}^{2}-\\frac{4\\bar{R}^{2}}{n\\lambda^{(K)2}}\\left[\\lambda^{(K)}\\left(4\\bar{R}+\\frac{\\lambda^{(K)}}{32\\bar{R}^{2}n}\\right)+8\\bar{R}^{2}(4+\\log\\log_{2}(8n^{2}M_{0}\\bar{R}))\\right]\\right\\},\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "and $s_{n}>0$ , then $P\\left(Y f_{\\hat{\\mu}}(Z)>0\\right)=1$ with probability $1-\\exp(-s_{n})$ .",
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "C.2 Proof of Theorem 2 ",
+        "text_level": 1,
+        "page_idx": 19
+    },
+    {
+        "type": "text",
+        "text": "Let ${\\hat{\\boldsymbol{\\mu}}}:={\\boldsymbol{\\mu}}^{(K)}$ and $\\mu^{*}:=\\mu_{[\\lambda^{(K)}]}$ . From the proof of Theorem 1 , with probability $1-\\exp(-t)$ , it holds that ",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{\\displaystyle\\frac{32\\bar{R}^{2}}{n\\lambda^{(K)}}+\\frac{4\\bar{R}}{n}+\\frac{\\lambda^{(K)}}{32\\bar{R}^{2}n^{2}}+\\frac{8\\bar{R}^{2}}{n\\lambda^{(K)}}\\left(t+\\log\\log_{2}(8n^{2}M_{0}\\bar{R})\\right)}\\\\ &{\\displaystyle\\geq\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}+\\frac{1}{2}\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})}\\\\ &{\\displaystyle\\geq\\frac{1}{2}\\left[\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}+\\lambda^{(K)}\\mathrm{KL}(\\mu^{*},\\hat{\\mu})\\right]}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 19
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\geq\\frac{1}{2}\\left[\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}\\right].\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Since $Y f_{\\mu^{*}}(X)\\geq c_{0}$ almost surely, the Markov’s inequality yields that ",
+        "page_idx": 20
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array}{r l}&{P(Y f_{\\hat{\\mu}}<0)}\\\\ &{\\leq\\displaystyle\\frac{1}{\\ell(0)-(-c_{0}\\ell^{\\prime}(c_{0})+\\ell(c_{0}))}\\left(\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}\\right)}\\\\ &{=2\\psi(c_{0})\\displaystyle\\frac{1}{2}\\left(\\bar{L}(\\hat{\\mu})-\\bar{L}(\\mu^{*})-(\\hat{\\mu}-\\mu^{*})\\frac{\\delta\\bar{L}(\\mu^{*})}{\\delta\\mu}\\right).}\\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "This yields the assertion. ",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "DAdditional Experiments ",
+        "text_level": 1,
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "In addition to the 2 -sparse parity problem, here we give additional experiments for the $k$ -sparse parity problems with $k=3$ and $k=4$ . The setting is the same with the main text, except that the width, step size, the number of iterations are modified to $N=2,000$ ,$\\eta=0.2$ , and $T=10,000$ , and we take different grids of $n$ and $d$ . We ran the experiment 10 times and plotted the mean for each $n$ and $d$ . The results are provided in Figure 2 .",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "For $k=3$ , which is shown in Figure 2 (a), we can see that there appear phase-transition lines of $n=\\Theta(d^{2})$ and $n=\\Theta(d)$ , which correspond to the test accuracy of around $\\bar{9}0\\%$ and the test accuracy of around $70\\%$ , respectively. The former almost perfect classification means the Type I convergence in 4.2 , where the classification error gets exponentially small with respect to $n/d^{2}$ . The latter means the Type $\\mathrm{II}$ polynomial convergence. ",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "For $k=4$ , presented in Figure 2 (b), only the linear phase-transition, that corresponds to the test accuracy of around $70\\%$ , is observed. ",
+        "page_idx": 20
+    },
+    {
+        "type": "text",
+        "text": "Together with Section 5 , we conclude that the our theoretical results are experimentally verified for the 2 -sparse parity problem as well as higher-order sparse parity problems. The reason why the quadratic line was not observed in $k=4$ would be partially because the hidden coefficients and the required number of steps are exponentially large with respect to $k$ .",
+        "page_idx": 20
+    },
+    {
+        "type": "image",
+        "img_path": "images/29f09192de7d0dd2f5c06f8655e94c4997821e31b3becdc7f1d9639fe0126292.jpg",
+        "img_caption": [
+            "Figure 2: Test accuracy of two-layer neural network trained by MFLD to learn a $d$ -dimensional $k$ -sparse parity problems. "
+        ],
+        "img_footnote": [],
+        "page_idx": 20
+    }
+]
