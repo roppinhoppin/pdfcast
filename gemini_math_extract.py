@@ -5,7 +5,8 @@ import argparse
 from dotenv import load_dotenv
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--postnum", type=str, required=True)
+parser.add_argument("--postnum", "-p", type=str, required=True)
+
 # parser.add_argument("--update", type=bool, required=False, default=False)
 parser.add_argument("--update", action="store_true")
 args = parser.parse_args()
@@ -22,8 +23,12 @@ flash_model = genai.GenerativeModel('models/gemini-1.5-flash')
 pro_model = genai.GenerativeModel('models/gemini-1.5-pro')
 
 markdown_content = ""
-with open(f"pdf/{postnum}/auto/{postnum}.md", "r") as f:
-    markdown_content = f.read()
+if os.path.exists(f"pdf/{postnum}/auto/{postnum}.md"):
+    with open(f"pdf/{postnum}/auto/{postnum}.md", "r") as f:
+        markdown_content = f.read()
+else:
+    print(f"File pdf/{postnum}/auto/{postnum}.md does not exist.")
+    exit(1)
 
 prompt = f"""
 You are professional mathematician. 
@@ -51,7 +56,7 @@ if os.path.exists(f"pdf/{postnum}/auto/math_extract.md") and update is False:
 else:
     response = model.generate_content(prompt)
 
-    with open(f"pdf/{postnum}/auto/math_extract.md", "w") as f:
+    with open(f"math/{postnum}.md", "w") as f:
         f.write(response.text)
 
 # print(response.choices[0].message)
