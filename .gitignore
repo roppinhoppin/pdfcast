@@ -9,3 +9,5 @@
 .venv/
 .env
 vendor/
+.jekyll-cache/
+__pycache__/

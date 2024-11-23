@@ -1,7 +1,6 @@
 import os
-import shutil
-import subprocess
 import platform
+import subprocess
 
 system = platform.system()
 
@@ -70,7 +69,7 @@ else:
 #         return image_files
 
 
-def convert_from_pdf(pdf_path, update=True):
+def convert_from_pdf(pdf_path, update=False):
     pdf_name = os.path.basename(pdf_path)[:-4]
     folder_path = os.path.join(os.path.dirname(pdf_path), pdf_name)
     image_folder = os.path.join(folder_path, "auto/images/")
@@ -120,4 +119,3 @@ if __name__ == "__main__":
 
     # pdf_directory = "pdf/"
     # iterate_and_convert(pdf_directory)
-
