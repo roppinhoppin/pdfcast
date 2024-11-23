@@ -139,7 +139,7 @@ for i, folder in enumerate(folders):
         transcription=transcription,
     )
 
-    if is_wav and is_pdf:
+    if is_pdf:
         with open(markdown_file_path, "w", encoding="utf-8") as file:
             file.write(markdown_content)
         print(f"Created podcast article: {markdown_file_path}")
