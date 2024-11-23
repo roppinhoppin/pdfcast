@@ -13,6 +13,7 @@ transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
 date: {date}
 images: {images}
+math_extract_path: /math/{num}.md
 description: AI-generated podcast from the PDF file {folder} / {num}
 layout: article
 title: {folder}
@@ -52,9 +53,10 @@ for i, folder in enumerate(folders):
     folder_path = os.path.join(directory, folder)
     pdf_file_path = folder_path + "/" + folder + ".pdf"
     # Write the markdown file
-    num = hashlib.md5(folder.encode()).hexdigest()
+    # num = hashlib.md5(folder.encode()).hexdigest()
     with open(pdf_file_path, "rb") as pdf_file:
-        num2 = hashlib.md5(pdf_file.read()).hexdigest()
+        num = hashlib.md5(pdf_file.read()).hexdigest()
+    # print(f"num: {num}, num2: {num2}")
 
     # Check if there's a file that contains num in the _posts directory
     existing_files = [f for f in os.listdir(output_dir) if str(num) in f]
@@ -65,7 +67,6 @@ for i, folder in enumerate(folders):
             print(f"Skipping existing podcast article for folder: {folder}")
             continue
     else:
-        num = num2
         markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     markdown_file_path = os.path.join(output_dir, markdown_file_name)
 

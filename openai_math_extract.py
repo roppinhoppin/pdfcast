@@ -22,7 +22,7 @@ system_prompt = """
 You are professional mathematician. Your job is to extract important mathematical statements (not just formulas) like definitions, theorems etc... in a given markdown source and list them all but you need to produce them in a proper markdown format  so that it can be rendered by mathjax (e.g. delimiters should be "$$" instead of "$" and fix "\b", "{{" etc...) and fix typographical errors caused by OCR. Just list these statements and do not add conclusions, titles, comments, or other unnecessary information. Markdown code below is an example of an ideal output.
 """
 markdown_content = ""
-with open(f"pdf/{postnum}/auto/{postnum}.md", "r") as f:
+with open(f"magic-pdf/{postnum}/auto/{postnum}.md", "r") as f:
     markdown_content = f.read()
 
 if os.path.exists(f"math/{postnum}.md") and update is False:
