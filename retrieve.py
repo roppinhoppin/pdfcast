@@ -1,6 +1,9 @@
+import argparse
+import hashlib
 import os
 from datetime import datetime
-import hashlib 
+
+import figure_extract
 
 # Define the directory to search for folders
 directory = "/Users/kaoru/Library/Mobile Documents/iCloud~is~workflow~my~workflows/Documents/pdfpod/"
@@ -14,6 +17,7 @@ audio_file_path: /audio/{num}.wav
 transcript_path: /transcript/{num}.txt
 pdffile_path: /pdf/{num}.pdf
 date: {date}
+images: {images}
 description: AI-generated podcast from the PDF file {folder}
 layout: article
 title: {folder}
@@ -23,6 +27,10 @@ title: {folder}
 {transcription}
 
 """
+
+parser = argparse.ArgumentParser(description=f"Retrieve podcast data from directory {directory} and turn the data into podcast")
+parser.add_argument("--update", action="store_true", help="Update existring article when .")
+args = parser.parse_args()
 
 # Get the list of folders in the directory
 folders = [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))]
@@ -42,15 +50,16 @@ for i,folder in enumerate(folders):
     num = hashlib.md5(folder.encode()).hexdigest()
     # Check if there's a file that contains num in the _posts directory
     existing_files = [f for f in os.listdir(output_dir) if str(num) in f]
+    markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     if existing_files:
         print(f"Skipping existing podcast article for folder: {folder}")
-        continue
+        if args.update:
+            markdown_file_name = existing_files[0]
+        else:
+            continue
     markdown_file_name = f"{datetime.now().strftime('%Y-%m-%d')}-{num}.md"
     markdown_file_path = os.path.join(output_dir, markdown_file_name)
     
-    if os.path.exists(markdown_file_path):
-        print(f"Skipping existing podcast article: {markdown_file_path}")
-        continue
     audio_file_path = folder_path + "/" + folder + ".wav"  # Replace spaces with underscores for file names
     pdf_file_path = folder_path + "/" +  folder + ".pdf"
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S +0900")
@@ -107,19 +116,45 @@ for i,folder in enumerate(folders):
     else:
         print(f"Transcript file not found: {transcript_file_path}")
 
+    # Extract images from the PDF file
+    images = figure_extract.convert_from_path(folder_path)
+    image_paths = []
+
+    # Create directory for images if it doesn't exist
+    image_output_dir = f"images/{num}/"
+    os.makedirs(image_output_dir, exist_ok=True)
+
+    for i, image in enumerate(images):
+        image_path = f"images/{num}/{i+1}.png"
+        image.save(image_path)
+        image_paths.append(image_path)
+
+    orig_image_files = figure_extract.convert_from_path(folder_path)
+    image_paths = []
+
+    # Create directory for images if it doesn't exist
+    image_output_dir = f"images/{num}/"
+    os.makedirs(image_output_dir, exist_ok=True)
+
+    for i, image in enumerate(orig_image_files):
+        with open(image, "rb") as src_file:
+            image_path = f"images/{num}/{i+1}.png"
+            with open(image_path, "wb") as dst_file:
+                dst_file.write(src_file.read())
+            image_paths.append(image_path)
+
     # Generate markdown content
     markdown_content = template.format(
         folder=folder,
         date=date,
         num=num,
+        images=image_paths,
         transcription=transcription
     )
     
-    if is_wav and is_pdf and is_txt:
+    if is_wav and is_pdf:
         with open(markdown_file_path, "w", encoding="utf-8") as file:
             file.write(markdown_content)
         print(f"Created podcast article: {markdown_file_path}")
     else:
         print(f"Skipping podcast article creation for folder: {folder}")
-
-    

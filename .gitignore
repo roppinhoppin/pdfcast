@@ -1,3 +1,9 @@
 /_site
 /.sass-cache
 .DS_Store
+.conda/
+.venv/
+.pytest_cache/
+.rye/
+.hatch/
+.venv/

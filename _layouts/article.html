@@ -36,7 +36,14 @@
             </p>
             <h2>内容紹介</h2>
             <p>{{ page.description }}</p>
+            {{ content }}
+            <h1>Original PDF</h1>
+            <object data="{{ site.github.url }}{{ page.pdffile_path }}" width="1000" height="1200" type="application/pdf"></object>
             <p><a href="{{ site.github.url }}{{ page.pdffile_path }}">PDFリンク</a></p>
+            <h2>Figures</h2>
+            {% for image in page.images %}
+              <img src="{{ site.github.url }}/{{ image }}" width="400">
+            {% endfor %}
             <!-- <h2>
               出演者
             </h2>
@@ -50,19 +57,18 @@
                 </a>
               {% endfor %}
             </div> -->
-            {{ content }}
           </section>
           <footer class="article-footer">
-            <a
+            <!-- <a
               class="twitter-share-button"
               href="https://twitter.com/intent/tweet?hashtags={{ site.hashtag }}&url={{ site.github.url }}{{ page.url }}&text={{ page.title }}"
             >
-              Tweet
+              Tweet -->
             </a>
           </footer>
         </article>
       </div>
     </main>
-    {% include footer.html %}
+    <!-- {% include footer.html %} -->
   </body>
 </html>
